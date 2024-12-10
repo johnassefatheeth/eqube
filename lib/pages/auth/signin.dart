@@ -9,26 +9,24 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String? _emailError;
-  String? _passwordError;
-
+  bool _isLoading = false;
   void _signIn() {
     if (_formKey.currentState?.validate() ?? false) {
       // Perform the sign-in logic here (e.g., authenticate with a server)
-      print('Signing in with email: ${_emailController.text} and password: ${_passwordController.text}');
+      print('Signing in with phone: ${_phoneController.text} and password: ${_passwordController.text}');
     }
   }
 
-  String? _validateEmail(String? value) {
+  String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'Phone number is required';
     }
-    final emailRegExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegExp.hasMatch(value)) {
-      return 'Please enter a valid email';
+    final phoneRegExp = RegExp(r'^\+251\d{9}$');
+    if (!phoneRegExp.hasMatch(value)) {
+      return 'Please enter a valid Ethiopian phone number starting with +251';
     }
     return null;
   }
@@ -56,19 +54,16 @@ class _SignInPageState extends State<SignInPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Email input field
               TextFormField(
-                controller: _emailController,
+                controller: _phoneController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
+                  labelText: 'Phone Number',
+                  hintText: 'Enter your phone number',
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
+                keyboardType: TextInputType.phone,
+                validator: _validatePhone,
               ),
               SizedBox(height: 20),
-
-              // Password input field
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -79,27 +74,23 @@ class _SignInPageState extends State<SignInPage> {
                 validator: _validatePassword,
               ),
               SizedBox(height: 20),
-
-              // Sign In button with the same styling as Sign Up button
               Center(
-                child: ElevatedButton(
-                  onPressed: _signIn,
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Same color as the sign-up button
-                    padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _signIn,
+                        child: Text('Sign In'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
               ),
+              
               SizedBox(height: 20),
-
-              // Row for Sign Up and Forgot Password links
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -107,7 +98,7 @@ class _SignInPageState extends State<SignInPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(builder: (context) =>const SignUpPage()),
                       );
                     },
                     child: Text('Sign Up'),

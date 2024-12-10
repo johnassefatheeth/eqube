@@ -62,7 +62,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 onPressed: _forgotPassword,
                 child: const Text('Send Reset Code'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Link to return to the Sign In page
               Row(
@@ -72,7 +72,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     onPressed: () {
                       Navigator.pop(context); // Go back to Sign In page
                     },
-                    child: Text('Remember your password? Sign In'),
+                    child: const Text('Remember your password? Sign In'),
                   ),
                 ],
               ),

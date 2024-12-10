@@ -1,3 +1,4 @@
+import 'package:ekube/pages/auth/verification.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -13,9 +14,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String? _phoneError;
-  String? _passwordError;
-  String? _confirmPasswordError;
+  bool _isLoading = false;
 
   // Validate phone number for Ethiopian format
   String? _validatePhone(String? value) {
@@ -43,7 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
   // Validate confirm password
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'Confirm password is required';
     }
     if (value != _passwordController.text) {
       return 'Passwords do not match';
@@ -51,10 +50,27 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
+  // Handle the sign-up process
   void _signUp() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Perform the sign-up logic here (e.g., send data to server)
-      print('Sign Up with phone: ${_phoneController.text}, password: ${_passwordController.text}');
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Simulate a network request (e.g., sign-up logic)
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Once the sign-up process is done, navigate to the verification page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificationPage(),
+          ),
+        );
+      });
     }
   }
 
@@ -71,6 +87,7 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              // Phone number input field
               TextFormField(
                 controller: _phoneController,
                 decoration: InputDecoration(
@@ -81,6 +98,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 validator: _validatePhone,
               ),
               SizedBox(height: 20),
+
+              // Password input field
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -91,6 +110,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 validator: _validatePassword,
               ),
               SizedBox(height: 20),
+
+              // Confirm password input field
               TextFormField(
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(
@@ -101,21 +122,22 @@ class _SignUpPageState extends State<SignUpPage> {
                 validator: _validateConfirmPassword,
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _signUp,
-                child: Text('Sign Up'),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Go back to Sign In page
-                    },
-                    child: Text('Already have an account? Sign In'),
-                  ),
-                ],
+
+              // Sign up button
+              Center(
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _signUp,
+                        child: Text('Sign Up'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),

@@ -9,26 +9,26 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String? _phoneError;
+  String? _emailError;
   String? _passwordError;
 
   void _signIn() {
     if (_formKey.currentState?.validate() ?? false) {
       // Perform the sign-in logic here (e.g., authenticate with a server)
-      print('Signing in with phone: ${_phoneController.text} and password: ${_passwordController.text}');
+      print('Signing in with email: ${_emailController.text} and password: ${_passwordController.text}');
     }
   }
 
-  String? _validatePhone(String? value) {
+  String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Phone number is required';
+      return 'Email is required';
     }
-    final phoneRegExp = RegExp(r'^\+251\d{9}$');
-    if (!phoneRegExp.hasMatch(value)) {
-      return 'Please enter a valid Ethiopian phone number starting with +251';
+    final emailRegExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA0-9.-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegExp.hasMatch(value)) {
+      return 'Please enter a valid email';
     }
     return null;
   }
@@ -56,16 +56,19 @@ class _SignInPageState extends State<SignInPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              // Email input field
               TextFormField(
-                controller: _phoneController,
+                controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: 'Enter your phone number',
+                  labelText: 'Email',
+                  hintText: 'Enter your email',
                 ),
-                keyboardType: TextInputType.phone,
-                validator: _validatePhone,
+                keyboardType: TextInputType.emailAddress,
+                validator: _validateEmail,
               ),
               SizedBox(height: 20),
+
+              // Password input field
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -76,11 +79,27 @@ class _SignInPageState extends State<SignInPage> {
                 validator: _validatePassword,
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _signIn,
-                child: Text('Sign In'),
+
+              // Sign In button with the same styling as Sign Up button
+              Center(
+                child: ElevatedButton(
+                  onPressed: _signIn,
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Same color as the sign-up button
+                    padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: 20),
+
+              // Row for Sign Up and Forgot Password links
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -88,7 +107,7 @@ class _SignInPageState extends State<SignInPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>const SignUpPage()),
+                        MaterialPageRoute(builder: (context) => SignUpPage()),
                       );
                     },
                     child: Text('Sign Up'),

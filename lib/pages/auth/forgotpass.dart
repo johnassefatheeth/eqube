@@ -4,6 +4,7 @@ class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
 }
 
@@ -35,7 +36,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        title:const Text('Forgot Password'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -47,19 +48,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               // Phone number input field with validation
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Phone Number',
-                  hintText: 'Enter your phone number',
+                  hintText: 'Enter your phone number starting with +251',
                 ),
                 keyboardType: TextInputType.phone,
                 validator: _validatePhone,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Reset Password button
               ElevatedButton(
                 onPressed: _forgotPassword,
-                child: Text('Send Reset Code'),
+                child: const Text('Send Reset Code'),
               ),
               SizedBox(height: 20),
 

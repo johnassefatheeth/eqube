@@ -1,6 +1,5 @@
 import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/auth/signin.dart';
-import 'package:ekube/pages/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {

@@ -1,5 +1,7 @@
 import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/auth/signin.dart';
+import 'package:ekube/pages/home.dart';
+import 'package:ekube/pages/my_equb.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,9 +18,10 @@ class MyApp extends StatelessWidget {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: SignInPage(),
+      home: HomePage(),
       routes: {
         '/notifications': (context) => NotificationsPage(),
+        '/my_ekub': (context) => MyEqubPage(),
       },
     );
   }

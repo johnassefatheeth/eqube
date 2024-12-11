@@ -19,7 +19,7 @@ class _DrawerListState extends State<DrawerList> {
       child: Column(
         children: [
           menuItem("home", Icons.home),
-          menuItem("join ekub", Icons.plus_one_outlined),
+          menuItem("my_ekub", Icons.plus_one_outlined),
           menuItem("completed equbs", Icons.check_box),
           menuItem("profile", Icons.man),
           menuItem("change password", Icons.key),
@@ -51,6 +51,8 @@ class _DrawerListState extends State<DrawerList> {
         Navigator.pushNamed(context, '/settings');
         if(title=='የኔ ኣካውንት')
         Navigator.pushNamed(context, '/myprofile');
+        if(title=='my_ekub')
+        Navigator.pushNamed(context, '/my_ekub');
         else
         Navigator.pushNamed(context, '/$title');
 

@@ -22,7 +22,7 @@ class _DrawerListState extends State<DrawerList> {
           menuItem("my_ekub", Icons.plus_one_outlined),
           menuItem("profile", Icons.man),
           menuItem("changepassword", Icons.key),
-          menuItem("contact us", Icons.phone)
+          menuItem("contactus", Icons.phone)
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/auth/signin.dart';
 import 'package:ekube/pages/changepass.dart';
+import 'package:ekube/pages/contactus.dart';
 import 'package:ekube/pages/home.dart';
 import 'package:ekube/pages/my_equb.dart';
 import 'package:ekube/pages/profile.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/my_ekub': (context) => MyEqubPage(),
         '/profile': (context) => ProfilePage(),
         '/changepassword': (context) => ChangePasswordPage(),
+        '/contactus': (context) => ContactUsPage(),
       },
     );
   }

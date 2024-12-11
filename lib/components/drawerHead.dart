@@ -13,7 +13,7 @@ class _DrawerHeaderpartState extends State<DrawerHeaderpart> {
   Widget build(BuildContext context) {
     // continer widget
     return Container(
-      color: const Color.fromARGB(255, 23, 55, 108),
+      color:  Colors.teal,
       width: double.infinity,
       height: 200,
       padding: const EdgeInsets.all(20),

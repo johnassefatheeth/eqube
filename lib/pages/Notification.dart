@@ -42,7 +42,10 @@ class NotificationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: Text('Notifications',
+            style: TextStyle(color: Colors.white)), // Set the title text color
+        backgroundColor: Colors.teal,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: ListView.builder(
         itemCount: notifications.length,

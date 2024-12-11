@@ -26,7 +26,10 @@ class SetEqubDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$equbType Equb Options'),
+        title: Text('$equbType Equb Options',
+            style: TextStyle(color: Colors.white)), // Set the title text color
+        backgroundColor: Colors.teal,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

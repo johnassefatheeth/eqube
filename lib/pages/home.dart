@@ -8,7 +8,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home',
+            style: TextStyle(color: Colors.white)), // Set the title text color
+        backgroundColor: Colors.teal,
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),

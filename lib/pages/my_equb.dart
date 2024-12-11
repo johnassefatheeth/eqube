@@ -73,7 +73,10 @@ class _MyEqubPageState extends State<MyEqubPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Equb'),
+        title: Text('My Equb',
+            style: TextStyle(color: Colors.white)), // Set the title text color
+        backgroundColor: Colors.teal,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: _currentIndex == 0 ? _buildActiveEqubs() : _buildEqubHistory(),
       bottomNavigationBar: BottomNavigationBar(

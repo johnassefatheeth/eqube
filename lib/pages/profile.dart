@@ -18,7 +18,6 @@ class _ProfilePageState extends State<ProfilePage> {
       'https://via.placeholder.com/150'; // Default profile picture
   String _phoneNumber = '0912345678'; // Non-editable phone number
   String _gender = 'Male'; // Default gender
-  String _location = 'Addis Ababa'; // Default location
 
   // Function to handle image picking (profile picture)
   Future<void> _pickImage() async {

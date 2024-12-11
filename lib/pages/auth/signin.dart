@@ -1,5 +1,6 @@
 import 'package:ekube/pages/auth/forgotpass.dart';
 import 'package:ekube/pages/auth/signup.dart';
+import 'package:ekube/pages/home.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -16,7 +17,16 @@ class _SignInPageState extends State<SignInPage> {
   void _signIn() {
     if (_formKey.currentState?.validate() ?? false) {
       // Perform the sign-in logic here (e.g., authenticate with a server)
-      print('Signing in with phone: ${_phoneController.text} and password: ${_passwordController.text}');
+      print('Signing in with email: ${_phoneController.text} and password: ${_passwordController.text}');
+
+      // Simulate a successful sign-in (in a real app, this would be after authentication)
+      Future.delayed(Duration(seconds: 2), () {
+        // Navigate to the HomePage after successful sign-in
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      });
     }
   }
 

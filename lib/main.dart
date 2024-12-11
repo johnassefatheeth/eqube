@@ -1,4 +1,6 @@
+import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/auth/signin.dart';
+import 'package:ekube/pages/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,6 +18,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       home: SignInPage(),
+      routes: {
+        '/notifications': (context) => NotificationsPage(),
+      },
     );
   }
 }

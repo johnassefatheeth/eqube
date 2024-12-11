@@ -20,7 +20,6 @@ class _DrawerListState extends State<DrawerList> {
         children: [
           menuItem("home", Icons.home),
           menuItem("my_ekub", Icons.plus_one_outlined),
-          menuItem("completed equbs", Icons.check_box),
           menuItem("profile", Icons.man),
           menuItem("change password", Icons.key),
           menuItem("contact us", Icons.phone)

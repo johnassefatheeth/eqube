@@ -1,59 +1,103 @@
+import 'dart:convert';
+import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-class SetEqubDetailsPage extends StatelessWidget {
+class SetEqubDetailsPage extends StatefulWidget {
   final String equbType;
 
   // Constructor to accept the Equb type
   SetEqubDetailsPage({required this.equbType});
 
   @override
-  Widget build(BuildContext context) {
-    // Define options based on the Equb type
-    List<int> amounts;
-    List<int> peopleCount;
+  _SetEqubDetailsPageState createState() => _SetEqubDetailsPageState();
+}
 
-    if (equbType == 'Daily') {
-      amounts = [100, 300, 500, 1000];
-      peopleCount = [10, 20, 18, 8];
-    } else if (equbType == 'Weekly') {
-      amounts = [500, 1000, 1500, 2000];
-      peopleCount = [41, 25, 34, 20];
-    } else {  // Monthly
-      amounts = [1500, 2000, 3500, 5000, 10000];
-      peopleCount = [10, 20, 18, 8, 12];
+class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
+  late Future<List<Equb>> equbs;
+  late AuthProvider authProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Access the provider after the dependencies are resolved
+    authProvider = Provider.of<AuthProvider>(context);
+    // Now you can fetch Equbs using the token
+    equbs = fetchEqubs();
+  }
+
+  Future<List<Equb>> fetchEqubs() async {
+    // Get the token value from the provider
+    String? token = authProvider.token;
+
+    final response = await http.get(
+  Uri.parse('http://localhost:5000/api/equbs/equbs'),
+  headers: {
+    'Authorization': 'Bearer $token', 
+  },
+);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((equbJson) => Equb.fromJson(equbJson)).toList();
+    } else {
+      throw Exception(response.toString());
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$equbType Equb Options',
-            style: TextStyle(color: Colors.white)), // Set the title text color
+        title: Text('Available Equbs', style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: amounts.length,
-          itemBuilder: (context, index) {
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 8),
-              child: ListTile(
-                title: Text('${amounts[index]} Birr'),
-                subtitle: Text('People: ${peopleCount[index]}'),
-                trailing: ElevatedButton.icon(
-                  onPressed: () {
-                    // Show the join Equb popup
-                    showDialog(
-                      context: context,
-                      builder: (context) => _showJoinEqubDialog(context),
-                    );
-                  },
-                  icon: Icon(Icons.add),
-                  label: Text('Join Equb'),
-                ),
-              ),
-            );
+        child: FutureBuilder<List<Equb>>(
+          future: equbs,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('No Equbs available.'));
+            } else {
+              List<Equb> equbsList = snapshot.data!;
+
+              return ListView.builder(
+                itemCount: equbsList.length,
+                itemBuilder: (context, index) {
+                  Equb equb = equbsList[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      title: Text(equb.name),
+                      subtitle: Text(
+                        'Total Amount: ${equb.totalAmount} Birr\n'
+                        'Frequency: ${equb.frequency}\n'
+                        'Status: ${equb.status}',
+                      ),
+                      trailing: ElevatedButton.icon(
+                        onPressed: () {
+                          // Show the join Equb popup
+                          showDialog(
+                            context: context,
+                            builder: (context) => _showJoinEqubDialog(context),
+                          );
+                        },
+                        icon: Icon(Icons.add),
+                        label: Text('Join Equb'),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
           },
         ),
       ),
@@ -226,6 +270,45 @@ Phone: [Your Contact Number]''''',
           child: Text('Close'),
         ),
       ],
+    );
+  }
+}
+
+// Equb model
+class Equb {
+  final String id;
+  final String name;
+  final int totalAmount;
+  final int contributionPerUser;
+  final String frequency;
+  final String status;
+  final DateTime startDate;
+  final DateTime endDate;
+  final List<dynamic> participants;
+
+  Equb({
+    required this.id,
+    required this.name,
+    required this.totalAmount,
+    required this.contributionPerUser,
+    required this.frequency,
+    required this.status,
+    required this.startDate,
+    required this.endDate,
+    required this.participants,
+  });
+
+  factory Equb.fromJson(Map<String, dynamic> json) {
+    return Equb(
+      id: json['_id'],
+      name: json['name'],
+      totalAmount: json['totalAmount'],
+      contributionPerUser: json['contributionPerUser'],
+      frequency: json['frequency'],
+      status: json['status'],
+      startDate: DateTime.parse(json['startDate']),
+      endDate: DateTime.parse(json['endDate']),
+      participants: json['participants'],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:ekube/pages/home.dart';
 import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Token exists, navigate to the main screen (replace with your main page)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyEqubPage()), // Replace with actual home page
+        MaterialPageRoute(builder: (context) => SignInPage()), // Replace with actual home page
       );
     } else {
       // No token, navigate to SignInPage

@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -157,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Text('Save Changes', style: TextStyle(fontSize: 16)),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

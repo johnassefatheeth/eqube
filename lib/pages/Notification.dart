@@ -44,7 +44,7 @@ class NotificationsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Notifications',
             style: TextStyle(color: Colors.white)), // Set the title text color
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: ListView.builder(

@@ -24,7 +24,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Contact Us'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -83,7 +83,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                     child: Text('Submit', style: TextStyle(fontSize: 16)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF005CFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -96,7 +96,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
               Center(
                 child: Text(
                   'Or contact us via email at: support@yourapp.com',
-                  style: TextStyle(fontSize: 14, color: Colors.teal),
+                  style: TextStyle(fontSize: 14, color: Color(0xFF005CFF)),
                 ),
               ),
             ],

@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:convert'; // For JSON encoding
+import 'package:ekube/pages/auth/signin.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; // Import http package
 
 class VerificationPage extends StatefulWidget {
-  const VerificationPage({super.key});
+  final String email; // Email as a parameter
+
+  const VerificationPage(String text, {super.key, required this.email}); // Constructor
 
   @override
   _VerificationPageState createState() => _VerificationPageState();
@@ -14,6 +19,17 @@ class _VerificationPageState extends State<VerificationPage> {
   bool _canResend = false;
   int _countdown = 120; // 2 minutes countdown
   late Timer _timer;
+
+
+// Show snackbar
+  void _showSnackBar(String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
 
   // Timer to count down 2 minutes
   void _startTimer() {
@@ -41,11 +57,44 @@ class _VerificationPageState extends State<VerificationPage> {
     super.dispose();
   }
 
-  // Handle verification logic
-  void _verifyCode() {
+  // Handle verification logic and send data to backend
+  Future<void> _verifyCode() async {
     String enteredCode = _controllers.map((controller) => controller.text).join('');
-    // Add logic here to verify the code entered by the user
-    print('Entered Code: $enteredCode');
+    if (enteredCode.length == 6) {
+      final payload = {
+        "email": widget.email,
+        "otp": enteredCode,
+      };
+
+      // URL of your backend endpoint
+      final url = Uri.parse('http://localhost:5000/api/users/verify-email');
+      try {
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(payload),
+        );
+
+        if (response.statusCode == 200) {
+          // Handle successful response
+          print('Verification successful');
+          _showSnackBar(response.body, Colors.green);
+           Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignInPage()),
+                      );
+        } else {
+          // Handle error
+          print('Error: ${response.body}');
+          _showSnackBar(response.body, Colors.red);
+        }
+      } catch (e) {
+        _showSnackBar(e.toString(), Colors.red);
+        print('Error: $e');
+      }
+    } else {
+      print('Please enter a valid 6-digit OTP');
+    }
   }
 
   // Handle resending the verification code
@@ -70,7 +119,12 @@ class _VerificationPageState extends State<VerificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Phone Number Verification'),
+        backgroundColor: Color(0xFF005CFF),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Email Verification',
+        style: TextStyle(
+          color: Colors.white
+        ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -81,7 +135,7 @@ class _VerificationPageState extends State<VerificationPage> {
             children: <Widget>[
               // Instructions for verification
               Text(
-                'Enter the 6-digit code sent to your phone number.',
+                'Enter the 6-digit code sent to your email.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               SizedBox(height: 20),
@@ -123,7 +177,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   onPressed: _clearInputs,
                   child: Text(
                     'Clear',
-                    style: TextStyle(color: Colors.blue, fontSize: 18),
+                    style: TextStyle(color: Color(0xFF005CFF), fontSize: 18),
                   ),
                 ),
               ),
@@ -160,7 +214,7 @@ class _VerificationPageState extends State<VerificationPage> {
                     style: TextStyle(fontSize: 20),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Color(0xFF005CFF),
                     padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),

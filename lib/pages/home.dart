@@ -10,7 +10,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Home',
             style: TextStyle(color: Colors.white)), // Set the title text color
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
           IconButton(

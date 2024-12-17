@@ -75,7 +75,7 @@ class _MyEqubPageState extends State<MyEqubPage> {
       appBar: AppBar(
         title: Text('My Equb',
             style: TextStyle(color: Colors.white)), // Set the title text color
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
       ),
       body: _currentIndex == 0 ? _buildActiveEqubs() : _buildEqubHistory(),

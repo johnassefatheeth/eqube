@@ -55,7 +55,12 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign In'),
+        backgroundColor: Color(0xFF005CFF),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Sign In',
+        style: TextStyle(
+          color: Colors.white
+        ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -89,9 +94,12 @@ class _SignInPageState extends State<SignInPage> {
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: _signIn,
-                        child: Text('Sign In'),
+                        child: Text('Sign In',
+                          style: TextStyle(
+                            color: Colors.white
+                          ),),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Color(0xFF005CFF),
                           padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),

@@ -47,7 +47,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Change Password'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF005CFF),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -134,7 +134,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     child: Text('Change Password', style: TextStyle(fontSize: 16)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF005CFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

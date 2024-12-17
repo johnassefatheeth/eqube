@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:ekube/pages/auth/verification.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,13 +13,20 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _subCityController = TextEditingController();
+  final _woredaController = TextEditingController();
+  final _houseNoController = TextEditingController();
 
+  String? _selectedGender;
   bool _isLoading = false;
 
-  // Validate phone number for Ethiopian format
+  // Validate fields
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
@@ -28,7 +38,6 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
-  // Validate password
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
@@ -39,7 +48,6 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
-  // Validate confirm password
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Confirm password is required';
@@ -50,94 +58,172 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
-  // Handle the sign-up process
-  void _signUp() {
+  // Show snackbar
+  void _showSnackBar(String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  // Handle sign-up
+  Future<void> _signUp() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulate a network request (e.g., sign-up logic)
-      Future.delayed(Duration(seconds: 2), () {
+      final url = Uri.parse('http://localhost:5000/api/users/signup'); // Update with your backend URL
+      final body = {
+        "name": _nameController.text,
+        "email": emailController.text,
+        "password": _passwordController.text,
+        "confirmpassword": _confirmPasswordController.text,
+        "phone": _phoneController.text,
+        "gender": _selectedGender,
+        "city": _cityController.text,
+        "subCity": _subCityController.text,
+        "woreda": _woredaController.text,
+        "houseNo": _houseNoController.text,
+      };
+
+      try {
+        final response = await http.post(
+          url,
+          headers:{'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        );
+
         setState(() {
           _isLoading = false;
         });
-        
-        // Once the sign-up process is done, navigate to the verification page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VerificationPage(),
-          ),
-        );
-      });
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          _showSnackBar(responseData['message'] ?? 'Sign-up successful!', Colors.green);
+          Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => VerificationPage(emailController.text.toString(), email: emailController.text.toString())),
+                      );
+          // Navigate to the next page if necessary
+        } else {
+          final errorData = jsonDecode(response.body);
+          _showSnackBar(errorData['error'] ?? 'Sign-up failed!', Colors.red);
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showSnackBar(e.toString(), Colors.red);
+        print(e.toString());
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-      
       appBar: AppBar(
-        title: Text('Sign Up'),
+        backgroundColor: Color(0xFF005CFF),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Sign Up',
+        style: TextStyle(
+          color: Colors.white
+        ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
             children: <Widget>[
-              // Phone number input field
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+                validator: (value) => value == null || value.isEmpty ? 'Full name is required' : null,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) => value == null || value.isEmpty ? 'Email is required' : null,
+              ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: 'Enter your phone number',
-                ),
+                decoration: InputDecoration(labelText: 'Phone Number'),
                 keyboardType: TextInputType.phone,
                 validator: _validatePhone,
               ),
               SizedBox(height: 20),
-
-              // Password input field
+              DropdownButtonFormField<String>(
+                value: _selectedGender,
+                decoration: InputDecoration(labelText: 'Gender'),
+                items: ['Male', 'Female'].map((String gender) {
+                  return DropdownMenuItem(value: gender, child: Text(gender));
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedGender = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Gender is required' : null,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _cityController,
+                decoration: InputDecoration(labelText: 'City'),
+                validator: (value) => value == null || value.isEmpty ? 'City is required' : null,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _subCityController,
+                decoration: InputDecoration(labelText: 'Sub City'),
+                validator: (value) => value == null || value.isEmpty ? 'Sub City is required' : null,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _woredaController,
+                decoration: InputDecoration(labelText: 'Woreda'),
+                keyboardType: TextInputType.number,
+                validator: (value) => value == null || value.isEmpty ? 'Woreda is required' : null,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _houseNoController,
+                decoration: InputDecoration(labelText: 'House No'),
+                keyboardType: TextInputType.text,
+                validator: (value) => value == null || value.isEmpty ? 'House No is required' : null,
+              ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                ),
+                decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: _validatePassword,
               ),
               SizedBox(height: 20),
-
-              // Confirm password input field
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm Password',
-                  hintText: 'Re-enter your password',
-                ),
+                decoration: InputDecoration(labelText: 'Confirm Password'),
                 obscureText: true,
                 validator: _validateConfirmPassword,
               ),
               SizedBox(height: 20),
-
-              // Sign up button
               Center(
                 child: _isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: _signUp,
-                        child: Text('Sign Up'),
+                       child: Text('Sign UP',
+                          style: TextStyle(
+                            color: Colors.white
+                          ),),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Color(0xFF005CFF),
                           padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
                         ),
                       ),
               ),

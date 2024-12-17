@@ -1,10 +1,12 @@
+import 'package:ekube/providers/auth_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ekube/pages/auth/signin.dart';
 import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/changepass.dart';
 import 'package:ekube/pages/contactus.dart';
 import 'package:ekube/pages/my_equb.dart';
 import 'package:ekube/pages/profile.dart';
-import 'package:flutter/material.dart';
-import 'package:ekube/pages/auth/signin.dart'; // Import your SignInPage here
 
 void main() {
   runApp(const MyApp());
@@ -15,18 +17,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      home: SplashScreen(),
-      routes: {
-        '/signin': (context) => SignInPage(),
-        '/notifications': (context) => NotificationsPage(),
-        '/my_ekub': (context) => MyEqubPage(),
-        '/profile': (context) => ProfilePage(),
-        '/changepassword': (context) => ChangePasswordPage(),
-        '/contactus': (context) => ContactUsPage(),
-      },
+    return ChangeNotifierProvider(
+      create: (context) => AuthProvider()..loadToken(), // Load the token on app start
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        home: SplashScreen(), // Show SplashScreen to handle initial routing
+        routes: {
+          '/signin': (context) => SignInPage(),
+          '/notifications': (context) => NotificationsPage(),
+          '/my_ekub': (context) => MyEqubPage(),
+          '/profile': (context) => ProfilePage(),
+          '/changepassword': (context) => ChangePasswordPage(),
+          '/contactus': (context) => ContactUsPage(),
+        },
+      ),
     );
   }
 }
@@ -40,17 +45,28 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToSignIn();
+    _navigateBasedOnToken();
   }
 
-  _navigateToSignIn() async {
-    // Duration of the splash screen display
-    await Future.delayed(Duration(seconds: 3));
-    // Navigate to the SignInPage after the delay
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => SignInPage()),
-    );
+  // Navigate based on whether the token is available
+  _navigateBasedOnToken() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.loadToken(); // Load the token from SharedPreferences
+
+    // Navigate to the appropriate page
+    if (authProvider.token != null) {
+      // Token exists, navigate to the main screen (replace with your main page)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyEqubPage()), // Replace with actual home page
+      );
+    } else {
+      // No token, navigate to SignInPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignInPage()),
+      );
+    }
   }
 
   @override
@@ -58,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,  // You can set any background color you like
       body: Center(
-        child: Image.asset('assets/images/logo.png'), // Your logo image file should be in the 'assets' folder
+        child: Image.asset('assets/images/logo.png'), // Your logo image file
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ekube/pages/submitpayemnet.dart';
 import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -171,13 +172,15 @@ class _JoinEqubDialogState extends State<JoinEqubDialog> {
           child: Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _isChecked ? () {
-            // Logic for joining the Equb can go here
-            Navigator.pop(context); // Close the dialog
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('You have joined the Equb!')),
-            );
-          } : null, // Only enable if the checkbox is checked
+          onPressed: _isChecked
+              ? () {
+                  // Logic for joining the Equb can go here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DepositPage()),
+                  );
+              }
+              : null, // Only enable if the checkbox is checked
           child: Text('Join'),
         ),
       ],

@@ -1,5 +1,9 @@
+import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -7,17 +11,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late AuthProvider authProvider; // Declare but don't initialize yet
+
   // Define text controllers
   TextEditingController _fullNameController = TextEditingController();
   TextEditingController _cityController = TextEditingController();
   TextEditingController _subCityController = TextEditingController();
   TextEditingController _weredaController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
 
   // Default data for the profile (to simulate existing user data)
   String _profilePictureUrl =
-      'https://via.placeholder.com/150'; // Default profile picture
-  String _phoneNumber = '0912345678'; // Non-editable phone number
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQubUz3YKP7UQO_YFz5IQ1J4ou7sbDXAoy-40_eHoRTdA&s'; // Default profile picture
   String _gender = 'Male'; // Default gender
+
+  bool _isLoading = true;
 
   // Function to handle image picking (profile picture)
   Future<void> _pickImage() async {
@@ -31,13 +39,78 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Function to fetch user data from API
+  Future<void> _fetchUserData() async {
+    final url = 'http://localhost:5000/api/users/user-data';
+    String? token = authProvider.token;  // Get the token from authProvider
+
+    try {
+      final response = await http.get(Uri.parse(url), headers: {
+        'Authorization': 'Bearer $token',
+      });
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final user = data['user'];
+
+        setState(() {
+          _fullNameController.text = user['name'];
+          _phoneController.text = user['phone'];
+          _cityController.text = user['city'];
+          _subCityController.text = user['subCity'];
+          _weredaController.text = user['woreda'].toString();
+          _gender = user['gender'];
+          _profilePictureUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQubUz3YKP7UQO_YFz5IQ1J4ou7sbDXAoy-40_eHoRTdA&s';  // Update profile image if available
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Initialize authProvider in didChangeDependencies instead of initState
+    authProvider = Provider.of<AuthProvider>(context);
+    // Fetch user data when dependencies are ready
+    if (_isLoading) {
+      _fetchUserData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
+          title: const Text('Profile',
+          style: TextStyle(
+            color: Colors.white
+          )),
+          backgroundColor: Color(0xFF005CFF),
+        ),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
-        backgroundColor: Color(0xFF005CFF),
-      ),
+          iconTheme: IconThemeData(color: Colors.white),
+          title: const Text('Profile',
+          style: TextStyle(
+            color: Colors.white
+          )),
+          backgroundColor: Color(0xFF005CFF),
+        ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -95,6 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                enabled: false
               ),
             ),
             SizedBox(height: 20),
@@ -102,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // Phone Number (non-editable)
             Text('Phone Number', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             TextField(
-              controller: TextEditingController(text: _phoneNumber),
+              controller: _phoneController,
               decoration: InputDecoration(
                 hintText: 'Phone number',
                 enabled: false,

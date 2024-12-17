@@ -1,4 +1,5 @@
 import 'package:ekube/pages/home.dart';
+import 'package:ekube/pages/submitpayemnet.dart';
 import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       create: (context) => AuthProvider()..loadToken(), // Load the token on app start
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Eqube',
         home: SplashScreen(), // Show SplashScreen to handle initial routing
         routes: {
           '/signin': (context) => SignInPage(),
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Token exists, navigate to the main screen (replace with your main page)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => SignInPage()), // Replace with actual home page
+        MaterialPageRoute(builder: (context) => HomePage()), // Replace with actual home page
       );
     } else {
       // No token, navigate to SignInPage

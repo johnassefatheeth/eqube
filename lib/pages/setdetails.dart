@@ -177,7 +177,7 @@ class _JoinEqubDialogState extends State<JoinEqubDialog> {
                   // Logic for joining the Equb can go here
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => DepositPage()),
+                    MaterialPageRoute(builder: (context) => DepositPage(EqubId: '123123')),
                   );
               }
               : null, // Only enable if the checkbox is checked

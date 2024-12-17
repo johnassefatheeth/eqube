@@ -36,7 +36,7 @@ void _showSnackBar(String message, Color color) {
 
       // Create the login data
       final Map<String, String> loginData = {
-        "email": _phoneController.text.trim(), // Assuming phone number is the email here
+        "email": _phoneController.text.trim(), 
         "password": _passwordController.text.trim(),
       };
 
@@ -59,7 +59,6 @@ void _showSnackBar(String message, Color color) {
           // Save the token using AuthProvider
           if (token != null) {
             Provider.of<AuthProvider>(context, listen: false).setToken(token);
-            print('here');
             // Navigate to the home page after successful sign-in
             Navigator.pushReplacement(
               context,

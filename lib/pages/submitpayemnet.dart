@@ -48,8 +48,8 @@ class _DepositPageState extends State<DepositPage> {
   void initState() {
     super.initState();
     _depositAmount = "500";  // This is the dynamic amount, can be set as needed
-    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
-    _slipImage = ""; // Initially no image attached
+    _selectedBank = "Comercial Bank of Ethiopia"; 
+    _slipImage = ""; 
   }
 
   @override

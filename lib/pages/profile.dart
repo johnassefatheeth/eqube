@@ -228,7 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Save Changes', style: TextStyle(fontSize: 16)),
+                  child: Text('Save Changes', style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),

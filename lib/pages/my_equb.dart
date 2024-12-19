@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart'; 
 import 'package:ekube/providers/auth_provider.dart';
@@ -28,6 +29,22 @@ class _MyEqubPageState extends State<MyEqubPage> {
     fetchEqubs(); // Fetch data when dependencies are ready
   }
 
+
+String formatDate(String dateStr) {
+  // Parse the input date string into a DateTime object
+  DateTime dateTime = DateTime.parse(dateStr);
+
+  // Check if the date is today
+  DateTime today = DateTime.now();
+  if (dateTime.year == today.year &&
+      dateTime.month == today.month &&
+      dateTime.day == today.day) {
+    return 'Today, ${DateFormat.Hm().format(dateTime)}'; // E.g., "Today, 10:30 AM"
+  }
+
+  // Format the date in a friendly manner
+  return DateFormat.yMMMMd().format(dateTime); // E.g., "December 10, 2024"
+}
   // Function to fetch Equb data from the API
   Future<void> fetchEqubs() async {
     String? token = authProvider.token;
@@ -123,8 +140,8 @@ class _MyEqubPageState extends State<MyEqubPage> {
                       Text('Amount Joined: ${equb.totalAmount} Birr'),
                       Text('Status: ${equb.status}'),
                       Text('Rounds: ${equb.rounds}'),
-                      Text('Start Date: ${equb.startDate}'),
-                      Text('Next Payout Date: ${equb.nextPayoutDate}'),
+                      Text('Start Date: ${formatDate(equb.startDate)}'),
+                      Text('Next Payout Date: ${formatDate(equb.nextPayoutDate)}'),
                     ],
                   ),
                   trailing: Chip(

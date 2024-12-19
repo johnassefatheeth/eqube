@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart'; 
+import 'package:ekube/providers/auth_provider.dart';
+import '../moels/equb_model.dart';
 
 class MyEqubPage extends StatefulWidget {
   @override
@@ -9,61 +14,62 @@ class _MyEqubPageState extends State<MyEqubPage> {
   // Index for bottom navigation
   int _currentIndex = 0;
 
-  // Active Equbs
-  List<Map<String, dynamic>> activeEqubs = [
-    {
-      'type': 'Monthly',
-      'amount': 2000,
-      'status': 'Waiting for people',
-      'peopleJoined': 5,
-      'potentialWin': 2000 * 5,
-      'round': 1,
-    },
-    {
-      'type': 'Weekly',
-      'amount': 1000,
-      'status': 'Currently being selected',
-      'peopleJoined': 15,
-      'potentialWin': 1000 * 15,
-      'round': 2,
-    },
-  ];
+  // Lists to hold Equbs
+  List<Equb> activeEqubs = [];
+  List<Equb> pastEqubs = [];
 
-  // History of past Equbs
-  List<Map<String, dynamic>> pastEqubs = [
-    {
-      'type': 'Daily',
-      'amount': 300,
-      'status': 'Closed',
-      'peopleJoined': 20,
-      'potentialWin': 300 * 20,
-      'round': 1,
-      'totalInvested': 300 * 5,
-      'totalGained': 300 * 20,
-    },
-    {
-      'type': 'Monthly',
-      'amount': 2000,
-      'status': 'Closed',
-      'peopleJoined': 12,
-      'potentialWin': 2000 * 12,
-      'round': 3,
-      'totalInvested': 2000 * 12,
-      'totalGained': 2000 * 12,
-    },
-  ];
+  late AuthProvider authProvider; // Declare AuthProvider here
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Now it's safe to access the provider in didChangeDependencies
+    authProvider = Provider.of<AuthProvider>(context); 
+    fetchEqubs(); // Fetch data when dependencies are ready
+  }
+
+  // Function to fetch Equb data from the API
+  Future<void> fetchEqubs() async {
+    String? token = authProvider.token;
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:5000/api/users/equb-groups'),
+        headers: {
+          'Authorization': 'Bearer $token', // Pass token in request headers
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> userGroups = data['userGroups'];
+
+        // Process the fetched Equbs
+        setState(() {
+          activeEqubs = userGroups
+              .where((equb) => equb['status'] == 'active')
+              .map((equb) => Equb.fromJson(equb))
+              .toList();
+
+          pastEqubs = userGroups
+              .where((equb) => equb['status'] != 'active')
+              .map((equb) => Equb.fromJson(equb))
+              .toList();
+        });
+      } else {
+        print(response);
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 
   // Function to get the color for status
   Color getStatusColor(String status) {
     switch (status) {
-      case 'Waiting for people':
+      case 'active':
         return Colors.orange;
-      case 'Currently being selected':
-        return Colors.blue;
-      case 'Closed':
+      case 'closed':
         return Colors.grey;
-      case 'Waiting for the next round':
-        return Colors.green;
       default:
         return Colors.black;
     }
@@ -73,8 +79,7 @@ class _MyEqubPageState extends State<MyEqubPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Equb',
-            style: TextStyle(color: Colors.white)), // Set the title text color
+        title: Text('My Equb', style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
       ),
@@ -102,62 +107,64 @@ class _MyEqubPageState extends State<MyEqubPage> {
 
   // Active Equbs tab
   Widget _buildActiveEqubs() {
-    return ListView.builder(
-      itemCount: activeEqubs.length,
-      itemBuilder: (context, index) {
-        final equb = activeEqubs[index];
-        return Card(
-          margin: EdgeInsets.all(8),
-          child: ListTile(
-            title: Text('${equb['type']} Equb'),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Amount Joined: ${equb['amount']} Birr'),
-                Text('Status: ${equb['status']}'),
-                Text('People Joined: ${equb['peopleJoined']}'),
-                Text('Potential Win: ${equb['potentialWin']} Birr'),
-                Text('Round: ${equb['round']}'),
-              ],
-            ),
-            trailing: Chip(
-              label: Text(equb['status']),
-              backgroundColor: getStatusColor(equb['status']),
-            ),
-          ),
-        );
-      },
-    );
+    return activeEqubs.isEmpty
+        ? Center(child: Text("No Active Equbs Found")) // Display "Not Found" message
+        : ListView.builder(
+            itemCount: activeEqubs.length,
+            itemBuilder: (context, index) {
+              final equb = activeEqubs[index];
+              return Card(
+                margin: EdgeInsets.all(8),
+                child: ListTile(
+                  title: Text(equb.name),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Amount Joined: ${equb.totalAmount} Birr'),
+                      Text('Status: ${equb.status}'),
+                      Text('Rounds: ${equb.rounds}'),
+                      Text('Start Date: ${equb.startDate}'),
+                      Text('Next Payout Date: ${equb.nextPayoutDate}'),
+                    ],
+                  ),
+                  trailing: Chip(
+                    label: Text(equb.status),
+                    backgroundColor: getStatusColor(equb.status),
+                  ),
+                ),
+              );
+            },
+          );
   }
 
   // Past Equbs tab
   Widget _buildEqubHistory() {
-    return ListView.builder(
-      itemCount: pastEqubs.length,
-      itemBuilder: (context, index) {
-        final equb = pastEqubs[index];
-        return Card(
-          margin: EdgeInsets.all(8),
-          child: ListTile(
-            title: Text('${equb['type']} Equb (Closed)'),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Amount Joined: ${equb['amount']} Birr'),
-                Text('People Joined: ${equb['peopleJoined']}'),
-                Text('Potential Win: ${equb['potentialWin']} Birr'),
-                Text('Round: ${equb['round']}'),
-                Text('Total Invested: ${equb['totalInvested']} Birr'),
-                Text('Total Gained: ${equb['totalGained']} Birr'),
-              ],
-            ),
-            trailing: Chip(
-              label: Text(equb['status']),
-              backgroundColor: getStatusColor(equb['status']),
-            ),
-          ),
-        );
-      },
-    );
+    return pastEqubs.isEmpty
+        ? Center(child: Text("No Past Equbs Found")) // Display "Not Found" message
+        : ListView.builder(
+            itemCount: pastEqubs.length,
+            itemBuilder: (context, index) {
+              final equb = pastEqubs[index];
+              return Card(
+                margin: EdgeInsets.all(8),
+                child: ListTile(
+                  title: Text('${equb.name} (Closed)'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Amount Joined: ${equb.totalAmount} Birr'),
+                      Text('Rounds: ${equb.rounds}'),
+                      Text('Start Date: ${equb.startDate}'),
+                      Text('End Date: ${equb.endDate}'),
+                    ],
+                  ),
+                  trailing: Chip(
+                    label: Text(equb.status),
+                    backgroundColor: getStatusColor(equb.status),
+                  ),
+                ),
+              );
+            },
+          );
   }
 }

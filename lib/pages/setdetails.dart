@@ -112,6 +112,8 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
 }
 
 class JoinEqubDialog extends StatefulWidget {
+  const JoinEqubDialog({super.key});
+
   @override
   _JoinEqubDialogState createState() => _JoinEqubDialogState();
 }

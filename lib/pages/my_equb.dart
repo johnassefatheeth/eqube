@@ -7,6 +7,8 @@ import 'package:ekube/providers/auth_provider.dart';
 import '../moels/equb_model.dart';
 
 class MyEqubPage extends StatefulWidget {
+  const MyEqubPage({super.key});
+
   @override
   _MyEqubPageState createState() => _MyEqubPageState();
 }
@@ -52,7 +54,7 @@ String formatDate(String dateStr) {
       final response = await http.get(
         Uri.parse('http://localhost:5000/api/users/equb-groups'),
         headers: {
-          'Authorization': 'Bearer $token', // Pass token in request headers
+          'Authorization': 'Bearer $token', 
         },
       );
 
@@ -73,10 +75,10 @@ String formatDate(String dateStr) {
               .toList();
         });
       } else {
-        print(response);
+      throw Exception();
       }
     } catch (error) {
-      print('Error: $error');
+      throw Exception(error);
     }
   }
 

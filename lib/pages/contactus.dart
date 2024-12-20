@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ContactUsPage extends StatefulWidget {
+  const ContactUsPage({super.key});
+
   @override
   _ContactUsPageState createState() => _ContactUsPageState();
 }
 
 class _ContactUsPageState extends State<ContactUsPage> {
   // Controllers for form fields
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _messageController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
 
   // Function to handle form submission
   void _submitForm() {
@@ -78,15 +80,15 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           _messageController.text.isNotEmpty
                       ? _submitForm
                       : null,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                    child: Text('Submit', style: TextStyle(fontSize: 16)),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF005CFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    child: Text('Submit', style: TextStyle(fontSize: 16)),
                   ),
                 ),
               ),

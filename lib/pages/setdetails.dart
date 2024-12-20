@@ -10,7 +10,7 @@ class SetEqubDetailsPage extends StatefulWidget {
   final String equbType;
 
   // Constructor to accept the Equb type
-  SetEqubDetailsPage({required this.equbType});
+  const SetEqubDetailsPage({super.key, required this.equbType});
 
   @override
   _SetEqubDetailsPageState createState() => _SetEqubDetailsPageState();

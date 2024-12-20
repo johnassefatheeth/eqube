@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -14,7 +16,7 @@ class DepositPage extends StatefulWidget {
   final String EqubId; // Accept the EqubId as a parameter
 
   // Constructor to accept the EqubId
-  DepositPage({required this.EqubId});
+  const DepositPage({super.key, required this.EqubId});
 
   @override
   _DepositPageState createState() => _DepositPageState();
@@ -237,15 +239,15 @@ class _DepositPageState extends State<DepositPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () => _submitDeposit(context),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ),
             ),

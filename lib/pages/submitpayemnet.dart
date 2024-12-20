@@ -59,9 +59,9 @@ class _DepositPageState extends State<DepositPage> {
 
       // Attach the image
       var imageFile = await http.MultipartFile.fromPath(
-        'receiptImage',  // This should match the field name expected by the backend (e.g., 'receiptImage')
+        'receiptImage', 
         _profilePictureUrl,
-        contentType: MediaType('image', 'jpeg'),  // You can adjust the MIME type if needed
+        contentType: MediaType('image', 'jpeg'),  
       );
       request.files.add(imageFile);
 
@@ -78,7 +78,7 @@ class _DepositPageState extends State<DepositPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit deposit request.')),
+          SnackBar(content: Text(response.toString())),
         );
       }
     } catch (e) {

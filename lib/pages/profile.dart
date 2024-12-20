@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -14,11 +16,11 @@ class _ProfilePageState extends State<ProfilePage> {
   late AuthProvider authProvider; // Declare but don't initialize yet
 
   // Define text controllers
-  TextEditingController _fullNameController = TextEditingController();
-  TextEditingController _cityController = TextEditingController();
-  TextEditingController _subCityController = TextEditingController();
-  TextEditingController _weredaController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _subCityController = TextEditingController();
+  final TextEditingController _weredaController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   // Default data for the profile (to simulate existing user data)
   String _profilePictureUrl =
@@ -226,15 +228,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     SnackBar(content: Text('Profile updated successfully!')),
                   );
                 },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Save Changes', style: TextStyle(color: Colors.white, fontSize: 16)),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  child: Text('Save Changes', style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ),
             ),

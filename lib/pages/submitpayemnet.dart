@@ -1,22 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';  // For MediaType class
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart' show kIsWeb; // To check platform
-import 'package:flutter/services.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:http/http.dart' as http;
-import 'package:html/html.dart' as html;
+import 'package:path/path.dart';  // To extract the file name from the path
 
 class DepositPage extends StatefulWidget {
   final String EqubId; // Accept the EqubId as a parameter
 
   // Constructor to accept the EqubId
-  const DepositPage({super.key, required this.EqubId});
+  DepositPage({required this.EqubId});
 
   @override
   _DepositPageState createState() => _DepositPageState();
@@ -24,45 +16,23 @@ class DepositPage extends StatefulWidget {
 
 class _DepositPageState extends State<DepositPage> {
   late String _depositAmount;
-  late String _selectedBank;
-  late String _slipImage;
   late String _EqubId;  // Store the passed EqubId
 
   String _profilePictureUrl = ''; // Initially no image
   bool _isImagePicked = false;  // To track if an image is selected
+  String _fileName = '';  // To store the file name of the selected image
 
   // Function to handle image picking (attachment of deposit slip)
   Future<void> _pickImage() async {
-    if (kIsWeb) {
-      // For Flutter Web: Use html package to select a file
-      final html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
-      uploadInput.accept = 'image/*';
-      uploadInput.click();
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-      uploadInput.onChange.listen((e) async {
-        final files = uploadInput.files;
-        if (files!.isEmpty) return;
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(files[0]!);
-        reader.onLoadEnd.listen((e) async {
-          final bytes = reader.result as Uint8List;
-          setState(() {
-            _profilePictureUrl = 'data:image/jpeg;base64,' + base64Encode(bytes);
-            _isImagePicked = true;
-          });
-        });
+    if (pickedFile != null) {
+      setState(() {
+        _profilePictureUrl = pickedFile.path;  // Save the image path
+        _isImagePicked = true;
+        _fileName = basename(pickedFile.path);  // Extract the file name from the path
       });
-    } else {
-      // For Mobile: Use ImagePicker to get the image
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile != null) {
-        setState(() {
-          _profilePictureUrl = pickedFile.path;
-          _isImagePicked = true;
-        });
-      }
     }
   }
 
@@ -88,23 +58,12 @@ class _DepositPageState extends State<DepositPage> {
       var request = http.MultipartRequest('POST', uri);
 
       // Attach the image
-      if (kIsWeb) {
-        // For Flutter Web: Attach the image as a byte array
-        final imageFile = http.MultipartFile.fromBytes(
-          'receiptImage', 
-          base64Decode(_profilePictureUrl.split(',')[1]), 
-          contentType: MediaType('image', 'jpeg'),
-        );
-        request.files.add(imageFile);
-      } else {
-        // For Mobile: Attach the image from file path
-        var imageFile = await http.MultipartFile.fromPath(
-          'receiptImage', 
-          _profilePictureUrl, 
-          contentType: MediaType('image', 'jpeg')
-        );
-        request.files.add(imageFile);
-      }
+      var imageFile = await http.MultipartFile.fromPath(
+        'receiptImage',  // This should match the field name expected by the backend (e.g., 'receiptImage')
+        _profilePictureUrl,
+        contentType: MediaType('image', 'jpeg'),  // You can adjust the MIME type if needed
+      );
+      request.files.add(imageFile);
 
       // Add other form data (like EqubId)
       request.fields['equbId'] = _EqubId;
@@ -134,8 +93,6 @@ class _DepositPageState extends State<DepositPage> {
     super.initState();
     _EqubId = widget.EqubId; // Get the passed EqubId
     _depositAmount = "500";  // This is the dynamic amount, can be set as needed
-    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
-    _slipImage = ""; // Initially no image attached
   }
 
   @override
@@ -195,32 +152,28 @@ class _DepositPageState extends State<DepositPage> {
             ),
             SizedBox(height: 25),
 
-            // Attach Slip Image
+            // Attach Slip Image (File Name Display)
             Text('Attach Deposit Slip (image)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Center(
               child: Stack(
                 children: [
-                  // Displaying the image if picked, otherwise showing a placeholder
+                  // If an image is picked, display the file name; otherwise, show a placeholder
                   _isImagePicked
-                      ? ClipOval(
-                          child: kIsWeb
-                              ? Image.memory(
-                                  base64Decode(_profilePictureUrl.split(',')[1]),
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.file(
-                                  File(_profilePictureUrl),
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                ),
+                      ? Text(
+                          _fileName,  // Display the file name here
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey,
+                          ),
                         )
-                      : Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 40,
+                      : Text(
+                          'No image selected',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey,
+                          ),
                         ),
                   Positioned(
                     bottom: 0,
@@ -239,15 +192,15 @@ class _DepositPageState extends State<DepositPage> {
             Center(
               child: ElevatedButton(
                 onPressed: () => _submitDeposit(context),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                  child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ),
             ),

@@ -38,6 +38,8 @@ class NotificationsPage extends StatelessWidget {
     ),
   ];
 
+   NotificationsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +63,7 @@ class NotificationsPage extends StatelessWidget {
 class NotificationTile extends StatelessWidget {
   final NotificationItem notification;
 
-  const NotificationTile({required this.notification});
+  const NotificationTile({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {

@@ -41,7 +41,7 @@ void _showSnackBar(String message, Color color) {
       };
 
       // API request URL
-      final url = Uri.parse("http://localhost:5000/api/users/login");
+      final url = Uri.parse("http://localhost:8080/api/users/login");
 
       try {
         // Send POST request to the login API
@@ -71,7 +71,7 @@ void _showSnackBar(String message, Color color) {
         }
       } catch (e) {
         // Handle network or other errors
-        _showSnackBar("An error occurred. Please try again later.",Colors.red);
+        _showSnackBar("An error occurred. Please try again later."+e.toString(),Colors.red);
       } finally {
         setState(() {
           _isLoading = false; // Hide loading indicator

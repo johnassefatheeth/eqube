@@ -43,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Function to fetch user data from API
   Future<void> _fetchUserData() async {
-    final url = 'http://localhost:5000/api/users/user-data';
+    final url = 'http://localhost:8080/api/users/user-data';
     String? token = authProvider.token;  // Get the token from authProvider
 
     try {

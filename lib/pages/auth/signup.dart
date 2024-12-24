@@ -74,7 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
         _isLoading = true;
       });
 
-      final url = Uri.parse('http://localhost:5000/api/users/signup'); // Update with your backend URL
+      final url = Uri.parse('http://localhost:8080/api/users/signup'); // Update with your backend URL
       final body = {
         "name": _nameController.text,
         "email": emailController.text,

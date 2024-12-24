@@ -52,7 +52,7 @@ String formatDate(String dateStr) {
     String? token = authProvider.token;
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:5000/api/users/equb-groups'),
+        Uri.parse('http://localhost:8080/api/users/equb-groups'),
         headers: {
           'Authorization': 'Bearer $token', 
         },

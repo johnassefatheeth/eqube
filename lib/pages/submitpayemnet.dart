@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';  // For MediaType class
 import 'package:path/path.dart';  // To extract the file name from the path
@@ -16,6 +17,8 @@ class DepositPage extends StatefulWidget {
 
 class _DepositPageState extends State<DepositPage> {
   late String _depositAmount;
+  late String _selectedBank;
+  late String _slipImage;
   late String _EqubId;  // Store the passed EqubId
 
   String _profilePictureUrl = ''; // Initially no image
@@ -59,9 +62,9 @@ class _DepositPageState extends State<DepositPage> {
 
       // Attach the image
       var imageFile = await http.MultipartFile.fromPath(
-        'receiptImage', 
+        'receiptImage',  // This should match the field name expected by the backend (e.g., 'receiptImage')
         _profilePictureUrl,
-        contentType: MediaType('image', 'jpeg'),  
+        contentType: MediaType('image', 'jpeg'),  // You can adjust the MIME type if needed
       );
       request.files.add(imageFile);
 
@@ -78,7 +81,7 @@ class _DepositPageState extends State<DepositPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response.toString())),
+          SnackBar(content: Text('Failed to submit deposit request.')),
         );
       }
     } catch (e) {
@@ -93,6 +96,8 @@ class _DepositPageState extends State<DepositPage> {
     super.initState();
     _EqubId = widget.EqubId; // Get the passed EqubId
     _depositAmount = "500";  // This is the dynamic amount, can be set as needed
+    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
+    _slipImage = ""; // Initially no image attached
   }
 
   @override

@@ -34,7 +34,7 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
     String? token = authProvider.token;
 
     final response = await http.get(
-  Uri.parse('http://localhost:5000/api/equbs/equbs'),
+  Uri.parse('http://localhost:8080/api/equbs/equbs'),
   headers: {
     'Authorization': 'Bearer $token', 
   },

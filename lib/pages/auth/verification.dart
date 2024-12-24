@@ -67,7 +67,7 @@ class _VerificationPageState extends State<VerificationPage> {
       };
 
       // URL of your backend endpoint
-      final url = Uri.parse('http://localhost:5000/api/users/verify-email');
+      final url = Uri.parse('http://localhost:6000/api/users/verify-email');
       try {
         final response = await http.post(
           url,

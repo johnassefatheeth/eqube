@@ -2,6 +2,7 @@ import 'package:ekube/pages/setdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:ekube/components/drawerHead.dart';
 import 'package:ekube/components/drawerList.dart';
+import 'package:ekube/components/slider.dart'; 
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -41,6 +42,11 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 170, // Set a fixed height for the slider
+              child: SliderP(),
+            ), // This is where you add your Slider widget
+
             // Title for the Equb options
             Text(
               'Choose Your Equb Type',
@@ -48,47 +54,48 @@ class HomePage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            SizedBox(height: 20), // Space between title and list
+            SizedBox(height: 10), // Space between title and list
 
+            // List of Equb types
             ListTile(
-  title: Text('Monthly Equb'),
-  leading: Icon(Icons.calendar_month),
-  onTap: () {
-    // Pass the 'Monthly' type to SetEqubDetailsPage
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
-      ),
-    );
-  },
-),
-ListTile(
-  title: Text('Weekly Equb'),
-  leading: Icon(Icons.calendar_today),
-  onTap: () {
-    // Pass the 'Weekly' type to SetEqubDetailsPage
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
-      ),
-    );
-  },
-),
-ListTile(
-  title: Text('Daily Equb'),
-  leading: Icon(Icons.date_range),
-  onTap: () {
-    // Pass the 'Daily' type to SetEqubDetailsPage
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
-      ),
-    );
-  },
-),
+              title: Text('Monthly Equb'),
+              leading: Icon(Icons.calendar_month),
+              onTap: () {
+                // Pass the 'Monthly' type to SetEqubDetailsPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Weekly Equb'),
+              leading: Icon(Icons.calendar_today),
+              onTap: () {
+                // Pass the 'Weekly' type to SetEqubDetailsPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Daily Equb'),
+              leading: Icon(Icons.date_range),
+              onTap: () {
+                // Pass the 'Daily' type to SetEqubDetailsPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

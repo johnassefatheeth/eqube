@@ -1,8 +1,9 @@
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:ekube/pages/setdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:ekube/components/drawerHead.dart';
 import 'package:ekube/components/drawerList.dart';
-import 'package:ekube/components/slider.dart'; 
+import 'package:ekube/components/slider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,6 +11,22 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          iconTheme: IconThemeData(color:Colors.white),
+        ),
+        child: CurvedNavigationBar(
+          color: Color(0xFF005CFF),
+          backgroundColor: Colors.transparent,
+          items: [
+            Icon(Icons.person, size: 30),
+            Icon(Icons.notifications, size: 30),
+            Icon(Icons.home, size: 30),
+            Icon(Icons.history, size: 30),
+            Icon(Icons.settings, size: 30),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: const Text('Home',
             style: TextStyle(color: Colors.white)), // Set the title text color
@@ -42,10 +59,11 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image Slider at the top
             SizedBox(
               height: 170, // Set a fixed height for the slider
               child: SliderP(),
-            ), // This is where you add your Slider widget
+            ), 
 
             // Title for the Equb options
             Text(
@@ -56,47 +74,101 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 10), // Space between title and list
 
-            // List of Equb types
-            ListTile(
-              title: Text('Monthly Equb'),
-              leading: Icon(Icons.calendar_month),
-              onTap: () {
-                // Pass the 'Monthly' type to SetEqubDetailsPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
+            // Horizontal Scrollable List of Equb types
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  EqubCard(
+                    title: 'Monthly Equb',
+                    icon: Icons.calendar_month,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Weekly Equb'),
-              leading: Icon(Icons.calendar_today),
-              onTap: () {
-                // Pass the 'Weekly' type to SetEqubDetailsPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
+                  EqubCard(
+                    title: 'Weekly Equb',
+                    icon: Icons.calendar_today,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Daily Equb'),
-              leading: Icon(Icons.date_range),
-              onTap: () {
-                // Pass the 'Daily' type to SetEqubDetailsPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
+                  EqubCard(
+                    title: 'Daily Equb',
+                    icon: Icons.date_range,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Reusable Widget for Equb Type Cards
+class EqubCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const EqubCard({
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0), // Space between cards
+      child: GestureDetector(
+        onTap: onTap,
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            width: 150,  // Fixed width for each card
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: Colors.blue,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

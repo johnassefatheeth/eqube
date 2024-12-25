@@ -1,15 +1,42 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:ekube/pages/Notification.dart';
+import 'package:ekube/pages/changepass.dart';
+import 'package:ekube/pages/contactus.dart';
+import 'package:ekube/pages/my_equb.dart';
+import 'package:ekube/pages/profile.dart';
 import 'package:ekube/pages/setdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:ekube/components/drawerHead.dart';
 import 'package:ekube/components/drawerList.dart';
 import 'package:ekube/components/slider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int index = 2;
+
+  @override
   Widget build(BuildContext context) {
+  final items =<Widget>[
+    Icon(Icons.person, size: 30),
+    Icon(Icons.history, size: 30),
+    Icon(Icons.home, size: 30),
+    Icon(Icons.phone, size: 30),
+    Icon(Icons.settings, size: 30),
+  ];
+
+  final screens=[
+    ProfilePage(),
+    MyEqubPage(),
+    homeBody(),
+    ContactUsPage(),
+    ChangePasswordPage(),
+  ];
     return Scaffold(
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
@@ -18,18 +45,14 @@ class HomePage extends StatelessWidget {
         child: CurvedNavigationBar(
           color: Color(0xFF005CFF),
           backgroundColor: Colors.transparent,
-          items: [
-            Icon(Icons.person, size: 30),
-            Icon(Icons.notifications, size: 30),
-            Icon(Icons.home, size: 30),
-            Icon(Icons.history, size: 30),
-            Icon(Icons.settings, size: 30),
-          ],
+          index: index,
+          items: items,
+          onTap: (index) => setState(() => this.index = index),
         ),
       ),
       appBar: AppBar(
         title: const Text('Home',
-            style: TextStyle(color: Colors.white)), // Set the title text color
+            style: TextStyle(color: Colors.white)), 
         backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
@@ -54,72 +77,76 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),  // Add padding for some spacing
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Slider at the top
-            SizedBox(
-              height: 170, // Set a fixed height for the slider
-              child: SliderP(),
-            ), 
+      body: screens[index],
+    );
+  }
 
-            // Title for the Equb options
-            Text(
-              'Choose Your Equb Type',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            SizedBox(height: 10), // Space between title and list
+  Padding homeBody() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),  // Add padding for some spacing
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image Slider at the top
+          SizedBox(
+            height: 170, // Set a fixed height for the slider
+            child: SliderP(),
+          ), 
 
-            // Horizontal Scrollable List of Equb types
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  EqubCard(
-                    title: 'Monthly Equb',
-                    icon: Icons.calendar_month,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
-                        ),
-                      );
-                    },
-                  ),
-                  EqubCard(
-                    title: 'Weekly Equb',
-                    icon: Icons.calendar_today,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
-                        ),
-                      );
-                    },
-                  ),
-                  EqubCard(
-                    title: 'Daily Equb',
-                    icon: Icons.date_range,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+          // Title for the Equb options
+          Text(
+            'Choose Your Equb Type',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          SizedBox(height: 10), // Space between title and list
+
+          // Horizontal Scrollable List of Equb types
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                EqubCard(
+                  title: 'Monthly Equb',
+                  icon: Icons.calendar_month,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
+                      ),
+                    );
+                  },
+                ),
+                EqubCard(
+                  title: 'Weekly Equb',
+                  icon: Icons.calendar_today,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
+                      ),
+                    );
+                  },
+                ),
+                EqubCard(
+                  title: 'Daily Equb',
+                  icon: Icons.date_range,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

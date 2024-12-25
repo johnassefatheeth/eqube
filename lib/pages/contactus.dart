@@ -24,10 +24,6 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Contact Us'),
-        backgroundColor: Color(0xFF005CFF),
-      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(

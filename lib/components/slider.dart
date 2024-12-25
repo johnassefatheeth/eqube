@@ -39,9 +39,11 @@ class _SliderPState extends State<SliderP> {
               options: CarouselOptions(
                 height: 140,
                 autoPlay: true,
-                enableInfiniteScroll: false,
+                viewportFraction: 0.5,
+                aspectRatio: 2.0,
+                enableInfiniteScroll: true,
                 autoPlayAnimationDuration: Duration(seconds: 2),
-                enlargeCenterPage: false,
+                enlargeCenterPage: true,
                 onPageChanged: (index, reason) =>
                     setState(() => activeIndex = index),
               ),

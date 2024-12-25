@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
     ChangePasswordPage(),
   ];
     return Scaffold(
+      extendBody: true,
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           iconTheme: IconThemeData(color:Colors.white),

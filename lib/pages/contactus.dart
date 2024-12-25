@@ -24,6 +24,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(

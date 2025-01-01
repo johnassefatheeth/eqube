@@ -36,7 +36,7 @@ void _showSnackBar(String message, Color color) {
 
       // Create the login data
       final Map<String, String> loginData = {
-        "email": _phoneController.text.trim(), 
+        "phone": _phoneController.text.trim(), 
         "password": _passwordController.text.trim(),
       };
 
@@ -141,10 +141,10 @@ void _showSnackBar(String message, Color color) {
               TextFormField(
                 controller: _phoneController,
                 decoration: InputDecoration(
-                  labelText: 'email',
-                  hintText: 'Enter your email',
+                  labelText: 'phone number',
+                  hintText: 'Enter your phone number',
                 ),
-                keyboardType: TextInputType.emailAddress,
+                keyboardType: TextInputType.number,
                 // validator: _validatePhone,
               ),
               SizedBox(height: 20),

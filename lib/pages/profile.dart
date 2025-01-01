@@ -98,14 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          title: const Text('Profile',
-          style: TextStyle(
-            color: Colors.white
-          )),
-          backgroundColor: Color(0xFF005CFF),
-        ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -233,6 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+            SizedBox(height: 80),
           ],
         ),
       ),

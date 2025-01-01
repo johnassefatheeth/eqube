@@ -37,6 +37,18 @@ class _HomePageState extends State<HomePage> {
     ContactUsPage(),
     ChangePasswordPage(),
   ];
+  final appbarNames=<Widget>[
+    Text('Profile',
+     style: TextStyle(color: Colors.white)),
+    Text('My Equbs',
+     style: TextStyle(color: Colors.white)),
+    Text('Home',
+     style: TextStyle(color: Colors.white)),
+    Text('Contact Us',
+     style: TextStyle(color: Colors.white)),
+    Text('Settings',
+     style: TextStyle(color: Colors.white))
+  ];
     return Scaffold(
       extendBody: true,
       bottomNavigationBar: Theme(
@@ -52,8 +64,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       appBar: AppBar(
-        title: const Text('Home',
-            style: TextStyle(color: Colors.white)), 
+        title: appbarNames[index], 
         backgroundColor: Color(0xFF005CFF),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
@@ -66,18 +77,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: SingleChildScrollView(
-          child: Container(
-            child: const Column(
-              children: [
-                DrawerHeaderpart(),
-                DrawerList(),
-              ],
-            ),
-          ),
-        ),
-      ),
+      
       body: screens[index],
     );
   }

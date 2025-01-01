@@ -1,5 +1,10 @@
+import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:provider/provider.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   @override
@@ -7,11 +12,17 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
-  // Controllers for password fields
+
   TextEditingController _oldPasswordController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
+  late AuthProvider authProvider;
 
+  @override
+  void initState() {
+    super.initState();
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+  }
   // To check if passwords match
   bool _passwordsMatch = true;
 
@@ -37,9 +48,53 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   // Function to handle password change
-  void _changePassword() {
-    // Here, implement the actual password change logic with your backend or authentication service
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
+  Future<void> _changePassword() async {
+    // Ensure all fields are valid
+    if (_oldPasswordController.text.isEmpty ||
+        _newPasswordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty ||
+        !_passwordsMatch) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields correctly')));
+      return;
+    }
+    
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+    String? token = authProvider.token;
+
+    try {
+      // Make API call to change password
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/api/users/change-password'), // Use the correct endpoint here
+        headers: {
+          'Authorization': 'Bearer $token'
+        },
+        body: json.encode({
+          'oldPassword': _oldPasswordController.text,
+          'newPassword': _newPasswordController.text,
+        }),
+      );
+
+      Navigator.pop(context); // Close the loading indicator
+
+      if (response.statusCode == 200) {
+        // Success response
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
+      } else {
+        // Handle errors from backend
+        final responseBody = json.decode(response.body);
+        String message = responseBody['message'] ?? 'Error changing password';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (error) {
+      Navigator.pop(context); // Close the loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change password. Please try again.')));
+    }
   }
 
   @override

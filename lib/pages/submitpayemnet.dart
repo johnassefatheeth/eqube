@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';  // For MediaType class
 import 'package:path/path.dart';  // To extract the file name from the path
+import 'package:flutter/foundation.dart'; // for kIsWeb
+import 'dart:html' as html;  // for web support
+import 'package:provider/provider.dart'; // Assuming you are using provider
+import 'package:ekube/providers/auth_provider.dart';
 
 class DepositPage extends StatefulWidget {
   final String EqubId; // Accept the EqubId as a parameter
@@ -20,11 +23,23 @@ class _DepositPageState extends State<DepositPage> {
   late String _selectedBank;
   late String _slipImage;
   late String _EqubId;  // Store the passed EqubId
+  late AuthProvider authProvider;
 
   String _profilePictureUrl = ''; // Initially no image
   bool _isImagePicked = false;  // To track if an image is selected
   String _fileName = '';  // To store the file name of the selected image
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print(context);
+    // authProvider = Provider.of<AuthProvider>(context);  
+    
+    _EqubId = widget.EqubId;  // Get the passed EqubId
+    _depositAmount = "500";  // This is the dynamic amount, can be set as needed
+    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
+    _slipImage = ""; // Initially no image attached
+  }
   // Function to handle image picking (attachment of deposit slip)
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -40,7 +55,10 @@ class _DepositPageState extends State<DepositPage> {
   }
 
   // Function to handle form submission
-  Future<void> _submitDeposit(BuildContext context) async {
+  Future<void> _submitDeposit(context) async {
+    // Get the token value from the provider (similar to your other page)
+    String? token = authProvider.token;
+
     if (_EqubId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter your EqubId.')),
@@ -55,34 +73,69 @@ class _DepositPageState extends State<DepositPage> {
       return;
     }
 
-    // Prepare the request data
     try {
-      var uri = Uri.parse('http://localhost:5000/api/users/join-request');
-      var request = http.MultipartRequest('POST', uri);
-
-      // Attach the image
-      var imageFile = await http.MultipartFile.fromPath(
-        'receiptImage',  // This should match the field name expected by the backend (e.g., 'receiptImage')
-        _profilePictureUrl,
-        contentType: MediaType('image', 'jpeg'),  // You can adjust the MIME type if needed
-      );
-      request.files.add(imageFile);
-
-      // Add other form data (like EqubId)
-      request.fields['equbId'] = _EqubId;
-
-      // Send the request to the server
-      var response = await request.send();
-
-      // Handle the response
-      if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Your deposit request has been submitted!')),
+      if (kIsWeb) {
+        // Web platform handling (use the 'html' package for web)
+        final html.File imageFile = html.File(
+          [html.Blob([await html.HttpRequest.getString(_profilePictureUrl)])], 
+          _fileName,
+          {'type': 'image/jpeg'} // Specify the MIME type if needed
         );
+
+        var formData = html.FormData();
+        formData.appendBlob('receiptImage', imageFile); // 'receiptImage' should match the server field
+
+        // Add other form data (like EqubId)
+        formData.append('equbId', _EqubId);
+
+        // Send the request to the server using XMLHttpRequest
+        var xhr = html.HttpRequest();
+        xhr.open('POST', 'http://localhost:8080/api/users/join-request');
+        xhr.setRequestHeader('Authorization', 'Bearer $token');  // Add Authorization header
+        xhr.send(formData);
+
+        xhr.onLoadEnd.listen((event) {
+          if (xhr.status == 200) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Your deposit request has been submitted!')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to submit deposit request. Status code: ${xhr.status}')),
+            );
+          }
+        });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit deposit request.')),
+        // Mobile platform handling (http.MultipartRequest)
+        var uri = Uri.parse('http://localhost:5000/api/users/join-request');
+        var request = http.MultipartRequest('POST', uri);
+
+        // Attach the image
+        var imageFile = await http.MultipartFile.fromPath(
+          'receiptImage',
+          _profilePictureUrl,
+          contentType: MediaType('image', 'jpeg'),
         );
+        request.files.add(imageFile);
+
+        // Add other form data (like EqubId)
+        request.fields['equbId'] = _EqubId;
+
+        // Add Authorization header for mobile as well
+        request.headers['Authorization'] = 'Bearer $token';
+
+        // Send the request to the server
+        var response = await request.send();
+
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Your deposit request has been submitted!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to submit deposit request. Status code: ${response.statusCode}')),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,14 +144,6 @@ class _DepositPageState extends State<DepositPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _EqubId = widget.EqubId; // Get the passed EqubId
-    _depositAmount = "500";  // This is the dynamic amount, can be set as needed
-    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
-    _slipImage = ""; // Initially no image attached
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,12 +244,15 @@ class _DepositPageState extends State<DepositPage> {
                 onPressed: () => _submitDeposit(context),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  child: Text(
+                    'Submit Deposit Request',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                 ),
               ),

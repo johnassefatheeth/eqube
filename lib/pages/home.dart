@@ -1,9 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:ekube/pages/changepass.dart';
 import 'package:ekube/pages/contactus.dart';
 import 'package:ekube/pages/my_equb.dart';
 import 'package:ekube/pages/profile.dart';
 import 'package:ekube/pages/setdetails.dart';
+import 'package:ekube/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:ekube/components/slider.dart';
 
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
     MyEqubPage(),
     homeBody(),
     ContactUsPage(),
-    ChangePasswordPage(),
+    SettingsPage(),
   ];
   final appbarNames=<Widget>[
     Text('Profile',

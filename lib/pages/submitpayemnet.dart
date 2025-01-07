@@ -6,13 +6,14 @@ import 'package:path/path.dart';  // To extract the file name from the path
 import 'package:flutter/foundation.dart'; // for kIsWeb
 import 'dart:html' as html;  // for web support
 import 'package:ekube/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class DepositPage extends StatefulWidget {
   final String EqubId; 
   final int amount; 
 
   // Constructor to accept the EqubId
-  DepositPage({required this.EqubId,required this.amount});
+  DepositPage({required this.EqubId, required this.amount});
 
   @override
   _DepositPageState createState() => _DepositPageState();
@@ -20,20 +21,25 @@ class DepositPage extends StatefulWidget {
 
 class _DepositPageState extends State<DepositPage> {
   late int _depositAmount;
-  late String _EqubId; 
-  late AuthProvider authProvider;
+  late String _EqubId;
+  late AuthProvider authProvider;  // Declare the authProvider variable
 
   String _profilePictureUrl = ''; // Initially no image
   bool _isImagePicked = false;  // To track if an image is selected
   String _fileName = '';  // To store the file name of the selected image
+  
+  // Controller for user account number input
+  TextEditingController _accountNumberController = TextEditingController();
 
-    @override
-    void didChangeDependencies() {
-    super.didChangeDependencies();
-    _EqubId = widget.EqubId;  // Get the passed EqubId
-    _depositAmount = widget.amount;  // This is the dynamic amount, can be set as needed
+  // Initialize variables in the build method to ensure they are ready with context
+  @override
+  void initState() {
+    super.initState();
+    _EqubId = widget.EqubId;
+    _depositAmount = widget.amount;
   }
 
+  // Function to handle image picking (attachment of deposit slip)
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -47,12 +53,24 @@ class _DepositPageState extends State<DepositPage> {
     }
   }
 
-  Future<void> _submitDeposit(context) async {
-    String? token = authProvider.token;
+  // Function to handle form submission
+  Future<void> _submitDeposit(BuildContext context) async {
+    // Fetching AuthProvider here to ensure context is used safely
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
+    String? token = authProvider.token; // Getting the token from the AuthProvider
+
+    String userAccNumber = _accountNumberController.text; // Get the user input account number
 
     if (_EqubId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter your EqubId.')),
+      );
+      return;
+    }
+
+    if (userAccNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter your account number.')),
       );
       return;
     }
@@ -66,16 +84,18 @@ class _DepositPageState extends State<DepositPage> {
 
     try {
       if (kIsWeb) {
+        // Web platform handling (use the 'html' package for web)
         final html.File imageFile = html.File(
-          [html.Blob([await html.HttpRequest.getString(_profilePictureUrl)])], 
+          [html.Blob([await html.HttpRequest.getString(_profilePictureUrl)])],
           _fileName,
-          {'type': 'image/jpeg'}
+          {'type': 'image/jpeg'}  // Make sure the MIME type is set to image/jpeg
         );
 
         var formData = html.FormData();
-        formData.appendBlob('receiptImage', imageFile);
+        formData.appendBlob('receiptImage', imageFile, _fileName);  // Append file as blob with name
 
         formData.append('equbId', _EqubId);
+        formData.append('userAccNumber', userAccNumber); // Add the user account number dynamically
 
         var xhr = html.HttpRequest();
         xhr.open('POST', 'http://localhost:8080/api/users/join-request');
@@ -94,19 +114,26 @@ class _DepositPageState extends State<DepositPage> {
           }
         });
       } else {
+        // Mobile platform handling (http.MultipartRequest)
         var uri = Uri.parse('http://localhost:5000/api/users/join-request');
         var request = http.MultipartRequest('POST', uri);
 
+        // Attach the image
         var imageFile = await http.MultipartFile.fromPath(
-          'receiptImage',
+          'receiptImage',  // Ensure this matches the form field name on your backend
           _profilePictureUrl,
-          contentType: MediaType('image', 'jpeg'),
+          contentType: MediaType('image', 'jpeg'),  // Ensure the MIME type is correct
         );
         request.files.add(imageFile);
 
-        request.fields['equbId'] = _EqubId;
+        // Add other form data (like EqubId)
+        request.fields['equbId'] = _EqubId;  // Ensure this matches the form field name on the server
+        request.fields['userAccNumber'] = userAccNumber;  // Dynamically set the account number
+
+        // Add Authorization header
         request.headers['Authorization'] = 'Bearer $token';
 
+        // Send the request to the server
         var response = await request.send();
 
         if (response.statusCode == 201) {
@@ -128,6 +155,9 @@ class _DepositPageState extends State<DepositPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Fetching the AuthProvider here ensures that context is used correctly.
+    authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Deposit Payment', style: TextStyle(color: Colors.white)),
@@ -162,7 +192,7 @@ class _DepositPageState extends State<DepositPage> {
             Column(
               children: [
                 _buildBankRow('Comercial Bank of Ethiopia', 'images/cbe.png'),
-                _buildBankRow('Abisinya Bank', 'images/abbisiniya_bank.png'),
+                _buildBankRow('Abisinya Bank', 'images/abbisiniya.png'),
                 _buildBankRow('Awash Bank', 'images/awash.png'),
               ],
             ),
@@ -177,6 +207,18 @@ class _DepositPageState extends State<DepositPage> {
               ),
             ),
             SizedBox(height: 25),
+
+            Text('Account Number', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            TextField(
+              controller: _accountNumberController,
+              decoration: InputDecoration(
+                hintText: 'Enter your account number',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 20),
 
             Text('Attach Deposit Slip (image)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Center(
@@ -214,7 +256,7 @@ class _DepositPageState extends State<DepositPage> {
 
             Center(
               child: ElevatedButton(
-                onPressed: () => _submitDeposit(context),
+                onPressed: () => _submitDeposit(context), // Pass the context to the submit function
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   child: Text(

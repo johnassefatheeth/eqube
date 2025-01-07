@@ -1,4 +1,4 @@
-import 'dart:convert';  // For json.encode
+import 'dart:convert';
 import 'package:ekube/pages/home.dart';
 import 'package:ekube/pages/auth/forgotpass.dart';
 import 'package:ekube/pages/auth/signup.dart';
@@ -12,14 +12,44 @@ class SignInPage extends StatefulWidget {
   _SignInPageState createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
 
-void _showSnackBar(String message, Color color) {
+  // Animation Controller for smooth transitions
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the animation controller
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    // Start the animation
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the animation controller
+    super.dispose();
+  }
+
+  // Show snackbar for messages
+  void _showSnackBar(String message, Color color) {
     final snackBar = SnackBar(
       content: Text(message),
       backgroundColor: color,
@@ -36,7 +66,7 @@ void _showSnackBar(String message, Color color) {
 
       // Create the login data
       final Map<String, String> loginData = {
-        "phone": _phoneController.text.trim(), 
+        "phone": _phoneController.text.trim(),
         "password": _passwordController.text.trim(),
       };
 
@@ -67,11 +97,11 @@ void _showSnackBar(String message, Color color) {
           }
         } else {
           // Handle API failure (e.g., invalid credentials)
-          _showSnackBar("Invalid credentials. Please try again.",Colors.red);
+          _showSnackBar("Invalid credentials. Please try again.", Colors.red);
         }
       } catch (e) {
         // Handle network or other errors
-        _showSnackBar("An error occurred. Please try again later."+e.toString(),Colors.red);
+        _showSnackBar("An error occurred. Please try again later." + e.toString(), Colors.red);
       } finally {
         setState(() {
           _isLoading = false; // Hide loading indicator
@@ -80,36 +110,7 @@ void _showSnackBar(String message, Color color) {
     }
   }
 
-  // Show error dialog
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text("Error"),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // String? _validatePhone(String? value) {
-  //   if (value == null || value.isEmpty) {
-  //     return 'Phone number is required';
-  //   }
-  //   final phoneRegExp = RegExp(r'^\+251\d{9}$');
-  //   if (!phoneRegExp.hasMatch(value)) {
-  //     return 'Please enter a valid Ethiopian phone number starting with +251';
-  //   }
-  //   return null;
-  // }
-
+  // Validate password
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
@@ -135,71 +136,95 @@ void _showSnackBar(String message, Color color) {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
             children: <Widget>[
-              TextFormField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'phone number',
-                  hintText: 'Enter your phone number',
+              FadeTransition(
+                opacity: _animation,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8, // 80% width of screen
+                  child: TextFormField(
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      hintText: 'Enter your phone number',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    ),
+                    keyboardType: TextInputType.phone,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-                // validator: _validatePhone,
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
+              FadeTransition(
+                opacity: _animation,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    ),
+                    obscureText: true,
+                    validator: _validatePassword,
+                  ),
                 ),
-                obscureText: true,
-                validator: _validatePassword,
               ),
               SizedBox(height: 20),
-              Center(
-                child: _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _signIn,
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF005CFF),
-                          padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+              FadeTransition(
+                opacity: _animation,
+                child: Center(
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : ElevatedButton(
+                          onPressed: _signIn,
+                          child: Text(
+                            'Sign In',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF005CFF),
+                            padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
-                      ),
+                ),
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignUpPage()),
-                      );
-                    },
-                    child: Text('Sign Up'),
-                  ),
-                  Text(' | '),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
-                      );
-                    },
-                    child: Text('Forgot Password?'),
-                  ),
-                ],
+              FadeTransition(
+                opacity: _animation,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignUpPage()),
+                        );
+                      },
+                      child: Text('Sign Up'),
+                    ),
+                    Text(' | '),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                        );
+                      },
+                      child: Text('Forgot Password?'),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

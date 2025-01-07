@@ -1,6 +1,5 @@
 import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
@@ -22,24 +21,11 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _weredaController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  // Default data for the profile (to simulate existing user data)
-  String _profilePictureUrl =
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQubUz3YKP7UQO_YFz5IQ1J4ou7sbDXAoy-40_eHoRTdA&s'; // Default profile picture
   String _gender = 'Male'; // Default gender
 
   bool _isLoading = true;
 
-  // Function to handle image picking (profile picture)
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _profilePictureUrl = pickedFile.path;
-      });
-    }
-  }
+ 
 
   // Function to fetch user data from API
   Future<void> _fetchUserData() async {
@@ -62,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _subCityController.text = user['subCity'];
           _weredaController.text = user['woreda'].toString();
           _gender = user['gender'];
-          _profilePictureUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQubUz3YKP7UQO_YFz5IQ1J4ou7sbDXAoy-40_eHoRTdA&s';  // Update profile image if available
+// Update profile image if available
           _isLoading = false;
         });
       } else {
@@ -103,27 +89,8 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Picture Section
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: NetworkImage(_profilePictureUrl),
-                    backgroundColor: Colors.grey[300],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: Icon(Icons.camera_alt, color: Colors.white),
-                      onPressed: _pickImage,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
+            
+            SizedBox(height: 10),
 
             // Full Name
             Text('Full Name', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),

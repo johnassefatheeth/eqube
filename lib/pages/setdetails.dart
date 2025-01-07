@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:ekube/pages/submitpayemnet.dart';
-import 'package:ekube/providers/auth_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:ekube/pages/submitpayemnet.dart';
+import 'package:ekube/providers/auth_provider.dart';
 
 class SetEqubDetailsPage extends StatefulWidget {
   final String equbType; // Constructor to accept the Equb type
@@ -18,6 +18,7 @@ class SetEqubDetailsPage extends StatefulWidget {
 class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
   late Future<List<Equb>> equbs;
   late AuthProvider authProvider;
+ 
 
   @override
   void didChangeDependencies() {
@@ -25,11 +26,10 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
     // Access the provider after the dependencies are resolved
     authProvider = Provider.of<AuthProvider>(context);
     // Now you can fetch Equbs using the token
-    equbs = fetchEqubs();
+    equbs = fetchEqubs(widget.equbType);
   }
 
-  Future<List<Equb>> fetchEqubs() async {
-    // Get the token value from the provider
+   Future<List<Equb>> fetchEqubs(String equbType) async {
     String? token = authProvider.token;
     final response = await http.get(
       Uri.parse('http://localhost:8080/api/equbs/equbs'),
@@ -40,7 +40,14 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body)['data'];
-      return data.map((equbJson) => Equb.fromJson(equbJson)).toList();
+      // Filter Equbs based on the equbType and status == 'active'
+      List<Equb> filteredEqubs = data
+          .map((equbJson) => Equb.fromJson(equbJson))
+          .where((equb) =>
+              equb.frequency==equbType && equb.status == 'active') // Apply filter
+          .toList();
+
+      return filteredEqubs;
     } else {
       throw Exception(response.toString());
     }
@@ -71,101 +78,102 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
             } else {
               List<Equb> equbsList = snapshot.data!;
               return ListView.builder(
-  itemCount: equbsList.length,
-  itemBuilder: (context, index) {
-    Equb equb = equbsList[index];
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 12),
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(16),
-        title: Text(
-          equb.name,
-          style: TextStyle(
-            fontSize: 20,  // Larger font for the name
-            fontWeight: FontWeight.bold,
-            color: Colors.blueAccent, // Highlight the name
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.monetization_on, color: Colors.green, size: 18),
-                SizedBox(width: 8),
-                Text(
-                  'Total Amount: ${equb.totalAmount} Birr',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.repeat, color: Colors.orange, size: 18),
-                SizedBox(width: 8),
-                Text(
-                  'Frequency: ${equb.frequency}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  equb.status == 'active' ? Icons.check_circle : Icons.cancel,
-                  color: equb.status == 'active' ? Colors.green : Colors.red,
-                  size: 18,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'Status: ${equb.status}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: equb.status == 'active' ? Colors.green : Colors.red,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Color(0xFF005CFF),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          onPressed: () {
-            // Show the join Equb popup
-            showDialog(
-              context: context,
-              builder: (context) => _showJoinEqubDialog(context),
-            );
-          },
-          icon: Icon(Icons.add),
-          label: Text('Join Equb'),
-        ),
-      ),
-    );
-  },
-);
+                itemCount: equbsList.length,
+                itemBuilder: (context, index) {
+                  Equb equb = equbsList[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 12),
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16),
+                      title: Text(
+                        equb.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.monetization_on, color: Colors.green, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                'Total Amount: ${equb.totalAmount} Birr',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.repeat, color: Colors.orange, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                'Frequency: ${equb.frequency}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                equb.status == 'active' ? Icons.check_circle : Icons.cancel,
+                                color: equb.status == 'active' ? Colors.green : Colors.red,
+                                size: 18,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Status: ${equb.status}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: equb.status == 'active' ? Colors.green : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      trailing: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color(0xFF005CFF),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Show the join Equb popup
+                          showDialog(
+                            context: context,
+                            builder: (context) => _showJoinEqubDialog(context, equb),
+                          );
+                        },
+                        icon: Icon(Icons.add),
+                        label: Text('Join Equb'),
+                      ),
+                    ),
+                  );
+                },
+              );
             }
           },
         ),
@@ -174,13 +182,15 @@ class _SetEqubDetailsPageState extends State<SetEqubDetailsPage> {
   }
 
   // Popup for joining the Equb
-  Widget _showJoinEqubDialog(BuildContext context) {
-    return JoinEqubDialog();
+  Widget _showJoinEqubDialog(BuildContext context, Equb equb) {
+    return JoinEqubDialog(equb: equb);
   }
 }
 
 class JoinEqubDialog extends StatefulWidget {
-  const JoinEqubDialog({super.key});
+  final Equb equb;
+
+  const JoinEqubDialog({super.key, required this.equb});
 
   @override
   _JoinEqubDialogState createState() => _JoinEqubDialogState();
@@ -248,16 +258,18 @@ class _JoinEqubDialogState extends State<JoinEqubDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Color(0xFF005CFF),
+            foregroundColor: Colors.white,
+            backgroundColor: Color(0xFF005CFF),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
           ),
           onPressed: _isChecked
               ? () {
-                  // Logic for joining the Equb can go here
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => DepositPage(EqubId: '123123')),
+                    MaterialPageRoute(
+                      builder: (context) => DepositPage(EqubId: widget.equb.id,amount: widget.equb.totalAmount,),
+                    ),
                   );
                 }
               : null, // Only enable if the checkbox is checked
@@ -289,7 +301,8 @@ class _JoinEqubDialogState extends State<JoinEqubDialog> {
   }
 }
 
-// Equb model class
+
+
 class Equb {
   final String id;
   final String name;
@@ -300,6 +313,7 @@ class Equb {
   final DateTime startDate;
   final DateTime endDate;
   final List<dynamic> participants;
+  final String? nextPayoutDate; // Nullable field
 
   Equb({
     required this.id,
@@ -311,19 +325,22 @@ class Equb {
     required this.startDate,
     required this.endDate,
     required this.participants,
+    this.nextPayoutDate, // Nullable field
   });
 
   factory Equb.fromJson(Map<String, dynamic> json) {
     return Equb(
-      id: json['_id'],
-      name: json['name'],
-      totalAmount: json['totalAmount'],
-      contributionPerUser: json['contributionPerUser'],
-      frequency: json['frequency'],
-      status: json['status'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      participants: json['participants'],
+      id: json['_id'] ?? 'Unknown ID',  // Default if null
+      name: json['name'] ?? 'Unknown Equb', // Default if null
+      totalAmount: json['totalAmount'] ?? 0, // Default to 0 if null
+      contributionPerUser: json['contributionPerUser'] ?? 0, // Default if null
+      frequency: json['frequency'] ?? 'Unknown Frequency', // Default if null
+      status: json['status'] ?? 'inactive', // Default to 'inactive' if null
+      startDate: DateTime.parse(json['startDate'] ?? DateTime.now().toIso8601String()), // Default to current date if null
+      endDate: DateTime.parse(json['endDate'] ?? DateTime.now().toIso8601String()), // Default to current date if null
+      participants: json['participants'] ?? [], // Default to empty list if null
+      nextPayoutDate: json['nextPayoutDate'], // Nullable field, no default required
     );
   }
 }
+

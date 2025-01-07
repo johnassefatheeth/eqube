@@ -1,13 +1,10 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:ekube/pages/Notification.dart';
 import 'package:ekube/pages/changepass.dart';
 import 'package:ekube/pages/contactus.dart';
 import 'package:ekube/pages/my_equb.dart';
 import 'package:ekube/pages/profile.dart';
 import 'package:ekube/pages/setdetails.dart';
 import 'package:flutter/material.dart';
-import 'package:ekube/components/drawerHead.dart';
-import 'package:ekube/components/drawerList.dart';
 import 'package:ekube/components/slider.dart';
 
 class HomePage extends StatefulWidget {
@@ -115,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetEqubDetailsPage(equbType: 'Monthly'),
+                        builder: (context) => SetEqubDetailsPage(equbType: 'daily'),
                       ),
                     );
                   },
@@ -127,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetEqubDetailsPage(equbType: 'Weekly'),
+                        builder: (context) => SetEqubDetailsPage(equbType: 'daily'),
                       ),
                     );
                   },
@@ -139,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetEqubDetailsPage(equbType: 'Daily'),
+                        builder: (context) => SetEqubDetailsPage(equbType: 'daily'),
                       ),
                     );
                   },

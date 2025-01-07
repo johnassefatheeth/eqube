@@ -5,40 +5,36 @@ import 'package:http_parser/http_parser.dart';  // For MediaType class
 import 'package:path/path.dart';  // To extract the file name from the path
 import 'package:flutter/foundation.dart'; // for kIsWeb
 import 'dart:html' as html;  // for web support
-import 'package:provider/provider.dart'; // Assuming you are using provider
 import 'package:ekube/providers/auth_provider.dart';
 
 class DepositPage extends StatefulWidget {
-  final String EqubId; // Accept the EqubId as a parameter
+  final String EqubId; 
+  final int amount; 
 
   // Constructor to accept the EqubId
-  DepositPage({required this.EqubId});
+  DepositPage({required this.EqubId,required this.amount});
 
   @override
   _DepositPageState createState() => _DepositPageState();
 }
 
 class _DepositPageState extends State<DepositPage> {
-  late String _depositAmount;
-  late String _selectedBank;
-  late String _slipImage;
-  late String _EqubId;  // Store the passed EqubId
+  late int _depositAmount;
+  late String _EqubId; 
   late AuthProvider authProvider;
 
   String _profilePictureUrl = ''; // Initially no image
   bool _isImagePicked = false;  // To track if an image is selected
   String _fileName = '';  // To store the file name of the selected image
 
-  @override
-  void didChangeDependencies() {
+    @override
+    void didChangeDependencies() {
     super.didChangeDependencies();
-    print(context);
+    // print(context);
     // authProvider = Provider.of<AuthProvider>(context);  
     
     _EqubId = widget.EqubId;  // Get the passed EqubId
-    _depositAmount = "500";  // This is the dynamic amount, can be set as needed
-    _selectedBank = "Comercial Bank of Ethiopia"; // Example Bank name, can be dynamic
-    _slipImage = ""; // Initially no image attached
+    _depositAmount = widget.amount;  // This is the dynamic amount, can be set as needed
   }
   // Function to handle image picking (attachment of deposit slip)
   Future<void> _pickImage() async {

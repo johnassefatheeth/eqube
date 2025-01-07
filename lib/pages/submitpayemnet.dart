@@ -30,13 +30,10 @@ class _DepositPageState extends State<DepositPage> {
     @override
     void didChangeDependencies() {
     super.didChangeDependencies();
-    // print(context);
-    // authProvider = Provider.of<AuthProvider>(context);  
-    
     _EqubId = widget.EqubId;  // Get the passed EqubId
     _depositAmount = widget.amount;  // This is the dynamic amount, can be set as needed
   }
-  // Function to handle image picking (attachment of deposit slip)
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -50,9 +47,7 @@ class _DepositPageState extends State<DepositPage> {
     }
   }
 
-  // Function to handle form submission
   Future<void> _submitDeposit(context) async {
-    // Get the token value from the provider (similar to your other page)
     String? token = authProvider.token;
 
     if (_EqubId.isEmpty) {
@@ -71,23 +66,20 @@ class _DepositPageState extends State<DepositPage> {
 
     try {
       if (kIsWeb) {
-        // Web platform handling (use the 'html' package for web)
         final html.File imageFile = html.File(
           [html.Blob([await html.HttpRequest.getString(_profilePictureUrl)])], 
           _fileName,
-          {'type': 'image/jpeg'} // Specify the MIME type if needed
+          {'type': 'image/jpeg'}
         );
 
         var formData = html.FormData();
-        formData.appendBlob('receiptImage', imageFile); // 'receiptImage' should match the server field
+        formData.appendBlob('receiptImage', imageFile);
 
-        // Add other form data (like EqubId)
         formData.append('equbId', _EqubId);
 
-        // Send the request to the server using XMLHttpRequest
         var xhr = html.HttpRequest();
         xhr.open('POST', 'http://localhost:8080/api/users/join-request');
-        xhr.setRequestHeader('Authorization', 'Bearer $token');  // Add Authorization header
+        xhr.setRequestHeader('Authorization', 'Bearer $token');
         xhr.send(formData);
 
         xhr.onLoadEnd.listen((event) {
@@ -102,11 +94,9 @@ class _DepositPageState extends State<DepositPage> {
           }
         });
       } else {
-        // Mobile platform handling (http.MultipartRequest)
         var uri = Uri.parse('http://localhost:5000/api/users/join-request');
         var request = http.MultipartRequest('POST', uri);
 
-        // Attach the image
         var imageFile = await http.MultipartFile.fromPath(
           'receiptImage',
           _profilePictureUrl,
@@ -114,13 +104,9 @@ class _DepositPageState extends State<DepositPage> {
         );
         request.files.add(imageFile);
 
-        // Add other form data (like EqubId)
         request.fields['equbId'] = _EqubId;
-
-        // Add Authorization header for mobile as well
         request.headers['Authorization'] = 'Bearer $token';
 
-        // Send the request to the server
         var response = await request.send();
 
         if (response.statusCode == 201) {
@@ -140,7 +126,6 @@ class _DepositPageState extends State<DepositPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,7 +138,6 @@ class _DepositPageState extends State<DepositPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title Section
             Text(
               'Deposit Payment Instructions',
               style: TextStyle(
@@ -164,8 +148,6 @@ class _DepositPageState extends State<DepositPage> {
               ),
             ),
             SizedBox(height: 15),
-
-            // Dynamic deposit amount
             Text(
               'Please deposit the $_depositAmount Birr in one of the following payment methods:',
               style: TextStyle(
@@ -175,19 +157,17 @@ class _DepositPageState extends State<DepositPage> {
               ),
             ),
             SizedBox(height: 10),
-            Text(
-              '# Comercial Bank of Ethiopia\n1000072610613\n\n'
-              '# Abisinya Bank\n177020842\n\n'
-              '# Awash Bank\nEdget Equb 013201305396900\n\n',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.blueGrey[800],
-              ),
+
+            // Displaying bank names and images
+            Column(
+              children: [
+                _buildBankRow('Comercial Bank of Ethiopia', 'images/cbe.png'),
+                _buildBankRow('Abisinya Bank', 'images/abbisiniya_bank.png'),
+                _buildBankRow('Awash Bank', 'images/awash.png'),
+              ],
             ),
             SizedBox(height: 20),
 
-            // Instructions to attach slip
             Text(
               'And attach a screenshot or a picture of the deposit slip so that your request can be processed.',
               style: TextStyle(
@@ -198,12 +178,10 @@ class _DepositPageState extends State<DepositPage> {
             ),
             SizedBox(height: 25),
 
-            // Attach Slip Image (File Name Display)
             Text('Attach Deposit Slip (image)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Center(
               child: Stack(
                 children: [
-                  // If an image is picked, display the file name; otherwise, show a placeholder
                   _isImagePicked
                       ? Text(
                           _fileName,  // Display the file name here
@@ -234,7 +212,6 @@ class _DepositPageState extends State<DepositPage> {
             ),
             SizedBox(height: 20),
 
-            // Submit Button
             Center(
               child: ElevatedButton(
                 onPressed: () => _submitDeposit(context),
@@ -256,6 +233,30 @@ class _DepositPageState extends State<DepositPage> {
           ],
         ),
       ),
+    );
+  }
+
+  // Helper function to build a Row for each bank
+  Widget _buildBankRow(String bankName, String imagePath) {
+    return Row(
+      children: [
+        Image.asset(
+          imagePath,
+          width: 40,  // Set the width of the image
+          height: 40, // Set the height of the image
+        ),
+        SizedBox(width: 10),  // Space between the image and text
+        Expanded(
+          child: Text(
+            bankName,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.blueGrey[800],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

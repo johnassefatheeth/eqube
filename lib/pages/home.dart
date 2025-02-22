@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetEqubDetailsPage(equbType: 'daily'),
+                        builder: (context) => SetEqubDetailsPage(equbType: 'monthly'),
                       ),
                     );
                   },
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetEqubDetailsPage(equbType: 'daily'),
+                        builder: (context) => SetEqubDetailsPage(equbType: 'weekly'),
                       ),
                     );
                   },

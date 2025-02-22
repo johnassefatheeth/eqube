@@ -237,9 +237,9 @@ class _ProfilePageState extends State<ProfilePage> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Logged out succesfuly successfully!')),
-                  );
+                  
+                  authProvider.setToken('');
+                  Navigator.pushReplacementNamed(context, '/signin');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),

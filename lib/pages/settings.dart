@@ -29,69 +29,54 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Dark Mode Toggle
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Dark Mode',
-                  style: TextStyle(fontSize: 18),
-                ),
-                Switch(
-                  value: _isDarkMode,
-                  onChanged: _toggleDarkMode,
-                  activeColor: Colors.orange,
-                ),
-              ],
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          // Dark Mode Toggle
+          ListTile(
+            title: Text('Dark Mode', style: TextStyle(fontSize: 18)),
+            trailing: Switch(
+              value: _isDarkMode,
+              onChanged: _toggleDarkMode,
+              activeColor: Colors.orange,
             ),
-            SizedBox(height: 16),
+          ),
+          Divider(),
 
-            // Language Selection Dropdown
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Change Language',
-                  style: TextStyle(fontSize: 18),
-                ),
-                DropdownButton<String>(
-                  value: _selectedLanguage,
-                  items: ['English', 'Amharic']
-                      .map((lang) => DropdownMenuItem<String>(
-                            value: lang,
-                            child: Text(lang),
-                          ))
-                      .toList(),
-                  onChanged: _changeLanguage,
-                ),
-              ],
+          // Language Selection Dropdown
+          ListTile(
+            title: Text('Change Language', style: TextStyle(fontSize: 18)),
+            trailing: DropdownButton<String>(
+              value: _selectedLanguage,
+              items: ['English', 'Amharic']
+                  .map((lang) => DropdownMenuItem<String>(
+                        value: lang,
+                        child: Text(lang),
+                      ))
+                  .toList(),
+              onChanged: _changeLanguage,
             ),
-            SizedBox(height: 16),
+          ),
+          Divider(),
 
-            // Change Password Button
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChangePasswordPage()),
-                );
-              },
-              child: Text('Change Password'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), backgroundColor: Colors.blue,
-                textStyle: TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
+          // Change Password as a ListTile
+          ListTile(
+            title: Text('Change Password', style: TextStyle(fontSize: 18)),
+            trailing: Icon(Icons.lock, color: Colors.blue),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+              );
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
 

@@ -48,7 +48,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _subCityController.text = user['subCity'];
           _weredaController.text = user['woreda'].toString();
           _gender = user['gender'];
-// Update profile image if available
           _isLoading = false;
         });
       } else {
@@ -60,6 +59,53 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _changePassword() async {
+    
+    
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+    String? token = authProvider.token;
+
+    try {
+      // Make API call to change password
+      final response = await http.put(
+        Uri.parse('http://localhost:8080/api/users/profile'), // Use the correct endpoint here
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'name':_fullNameController.text,
+          'phone':_phoneController.text,
+          'gender':_gender,
+          'city':_cityController.text,
+          'subCity':_subCityController.text,
+          'woreda':_weredaController.text,
+        }),
+      );
+
+      Navigator.pop(context); // Close the loading indicator
+
+      if (response.statusCode == 200) {
+        // Success response
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
+      } else {
+        // Handle errors from backend
+        final responseBody = json.decode(response.body);
+        String message = responseBody['message'] ?? 'Error changing password';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (error) {
+      Navigator.pop(context); // Close the loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change password. Please try again.')));
     }
   }
 

@@ -69,10 +69,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     try {
       // Make API call to change password
-      final response = await http.post(
+      final response = await http.put(
         Uri.parse('http://localhost:8080/api/users/change-password'), // Use the correct endpoint here
         headers: {
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
         },
         body: json.encode({
           'oldPassword': _oldPasswordController.text,

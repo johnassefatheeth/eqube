@@ -77,7 +77,6 @@ class _VerificationPageState extends State<VerificationPage> {
 
         if (response.statusCode == 200) {
           // Handle successful response
-          print('Verification successful');
           _showSnackBar(response.body, Colors.green);
            Navigator.push(
                         context,

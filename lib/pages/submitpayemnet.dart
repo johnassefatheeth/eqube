@@ -261,7 +261,7 @@ class _DepositPageState extends State<DepositPage> {
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                   child: Text(
                     'Submit Deposit Request',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18,color: Colors.white),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(

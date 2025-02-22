@@ -12,25 +12,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late AuthProvider authProvider; // Declare but don't initialize yet
+  late AuthProvider authProvider;
 
-  // Define text controllers
   final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _subCityController = TextEditingController();
   final TextEditingController _weredaController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
 
-  String _gender = 'Male'; // Default gender
-
+  String _gender = 'Male';
   bool _isLoading = true;
 
- 
-
-  // Function to fetch user data from API
   Future<void> _fetchUserData() async {
     final url = 'http://localhost:8080/api/users/user-data';
-    String? token = authProvider.token;  // Get the token from authProvider
+    String? token = authProvider.token;
 
     try {
       final response = await http.get(Uri.parse(url), headers: {
@@ -43,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
         setState(() {
           _fullNameController.text = user['name'];
+          _emailController.text = user['email'];
           _phoneController.text = user['phone'];
           _cityController.text = user['city'];
           _subCityController.text = user['subCity'];
@@ -63,58 +60,54 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _changeProfile() async {
-    
-    
-
-    // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(child: CircularProgressIndicator()),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
     String? token = authProvider.token;
 
     try {
-      // Make API call to change profile
       final response = await http.put(
-        Uri.parse('http://localhost:8080/api/users/profile'), // Use the correct endpoint here
+        Uri.parse('http://localhost:8080/api/users/profile'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'name':_fullNameController.text,
-          'phone':_phoneController.text,
-          'gender':_gender,
-          'city':_cityController.text,
-          'subCity':_subCityController.text,
-          'woreda':_weredaController.text,
+          'name': _fullNameController.text,
+          'email': _emailController.text,
+          'phone': _phoneController.text,
+          'gender': _gender,
+          'city': _cityController.text,
+          'subCity': _subCityController.text,
+          'woreda': _weredaController.text,
         }),
       );
 
-      Navigator.pop(context); // Close the loading indicator
+      Navigator.pop(context);
 
       if (response.statusCode == 200) {
-        // Success response
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile edited successfully!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully!')));
       } else {
-        // Handle errors from backend
         final responseBody = json.decode(response.body);
-        String message = responseBody['message'] ?? 'Error editing profile';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        String message = responseBody['message'] ?? 'Error updating profile';
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (error) {
-      Navigator.pop(context); // Close the loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change password. Please try again.')));
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to update profile. Please try again.')));
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Initialize authProvider in didChangeDependencies instead of initState
     authProvider = Provider.of<AuthProvider>(context);
-    // Fetch user data when dependencies are ready
     if (_isLoading) {
       _fetchUserData();
     }
@@ -123,35 +116,38 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
-        extendBody: true,
+      return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-            // Full Name
-            Text('Full Name', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            // Personal Info
+            const Text('Personal Information',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
             TextField(
               controller: _fullNameController,
-              decoration: InputDecoration(
-                hintText: 'Enter your full name',
+              decoration: const InputDecoration(
+                hintText: 'Full Name',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // Gender
-            Text('Gender', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text('Gender',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
             DropdownButtonFormField<String>(
               value: _gender,
               onChanged: (newValue) {
@@ -160,100 +156,119 @@ class _ProfilePageState extends State<ProfilePage> {
                 });
               },
               items: ['Male', 'Female']
-                  .map((gender) => DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender),
-                      ))
+                  .map((gender) =>
+                      DropdownMenuItem(value: gender, child: Text(gender)))
                   .toList(),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                enabled: false
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            // Phone Number (non-editable)
-            Text('Phone Number', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            // Contact Information
+            const Text('Contact Information',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                hintText: 'Email',
+                border: OutlineInputBorder(),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+              ),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: _phoneController,
-              decoration: InputDecoration(
-                hintText: 'Phone number',
+              decoration: const InputDecoration(
+                hintText: 'Phone Number',
                 enabled: false,
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                 suffixIcon: Icon(Icons.phone, color: Colors.grey),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            // Location (City, Sub-city, Wereda)
-            Text('Location Details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            // Location Details
+            const Text('Location Details',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
             TextField(
               controller: _cityController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'City',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _subCityController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Sub-city',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _weredaController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Wereda',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Save Changes Button
             Center(
               child: ElevatedButton(
                 onPressed: _changeProfile,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF005CFF),
+                  backgroundColor: const Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Save Changes', style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: Text('Save Changes',
+                      style: TextStyle(color: Colors.white, fontSize: 14)),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
+            // Logout Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  
                   authProvider.setToken('');
                   Navigator.pushReplacementNamed(context, '/signin');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF005CFF),
+                  backgroundColor: const Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                  child: Text('Log out', style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: Text('Log out',
+                      style: TextStyle(color: Colors.white, fontSize: 14)),
                 ),
               ),
             ),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
           ],
         ),
       ),

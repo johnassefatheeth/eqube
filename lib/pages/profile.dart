@@ -62,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _changePassword() async {
+  Future<void> _changeProfile() async {
     
     
 
@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String? token = authProvider.token;
 
     try {
-      // Make API call to change password
+      // Make API call to change profile
       final response = await http.put(
         Uri.parse('http://localhost:8080/api/users/profile'), // Use the correct endpoint here
         headers: {
@@ -96,11 +96,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         // Success response
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile edited successfully!')));
       } else {
         // Handle errors from backend
         final responseBody = json.decode(response.body);
-        String message = responseBody['message'] ?? 'Error changing password';
+        String message = responseBody['message'] ?? 'Error editing profile';
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (error) {
@@ -220,12 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // Save Changes Button
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  // Here you can save the changes (e.g., send to server)
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Profile updated successfully!')),
-                  );
-                },
+                onPressed: _changeProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(

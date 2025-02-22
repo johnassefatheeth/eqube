@@ -25,14 +25,15 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   String? _selectedGender;
   bool _isLoading = false;
 
-  // Animation Controller for smooth transitions
   late AnimationController _controller;
   late Animation<double> _animation;
+
+  final PageController _pageController = PageController(initialPage: 0);
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the animation controller for fading and sliding in
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -45,7 +46,6 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
     _controller.forward();
   }
 
-  // Validate fields
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
@@ -77,7 +77,6 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
     return null;
   }
 
-  // Show snackbar
   void _showSnackBar(String message, Color color) {
     final snackBar = SnackBar(
       content: Text(message),
@@ -86,14 +85,13 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  // Handle sign-up
   Future<void> _signUp() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
 
-      final url = Uri.parse('http://localhost:8080/api/users/signup'); // Update with your backend URL
+      final url = Uri.parse('http://localhost:8080/api/users/signup');
       final body = {
         "name": _nameController.text,
         "email": emailController.text,
@@ -127,7 +125,6 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                 builder: (context) =>
                     VerificationPage(emailController.text.toString(), email: emailController.text.toString())),
           );
-          // Navigate to the next page if necessary
         } else {
           final errorData = jsonDecode(response.body);
           _showSnackBar(errorData['error'] ?? 'Sign-up failed!', Colors.red);
@@ -144,8 +141,219 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose the animation controller
+    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
+  }
+
+  Widget _buildPersonalInfoPage() {
+    return ListView(
+      children: <Widget>[
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Full Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              validator: (value) => value == null || value.isEmpty ? 'Full name is required' : null,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) => value == null || value.isEmpty ? 'Email is required' : null,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: DropdownButtonFormField<String>(
+              value: _selectedGender,
+              decoration: InputDecoration(
+                labelText: 'Gender',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              items: ['Male', 'Female'].map((String gender) {
+                return DropdownMenuItem(value: gender, child: Text(gender));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                });
+              },
+              validator: (value) => value == null ? 'Gender is required' : null,
+            ),
+          ),
+        ),
+    ],
+    );
+  }
+
+  Widget _buildContactInfoPage() {
+    return ListView(
+      children: <Widget>[
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              keyboardType: TextInputType.phone,
+              validator: _validatePhone,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              obscureText: true,
+              validator: _validatePassword,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _confirmPasswordController,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              obscureText: true,
+              validator: _validateConfirmPassword,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddressPage() {
+    return ListView(
+      children: <Widget>[
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _cityController,
+              decoration: InputDecoration(
+                labelText: 'City',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              validator: (value) => value == null || value.isEmpty ? 'City is required' : null,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _subCityController,
+              decoration: InputDecoration(
+                labelText: 'Sub City',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              validator: (value) => value == null || value.isEmpty ? 'Sub City is required' : null,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _woredaController,
+              decoration: InputDecoration(
+                labelText: 'Woreda',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) => value == null || value.isEmpty ? 'Woreda is required' : null,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        FadeTransition(
+          opacity: _animation,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: TextFormField(
+              controller: _houseNoController,
+              decoration: InputDecoration(
+                labelText: 'House No',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              validator: (value) => value == null || value.isEmpty ? 'House No is required' : null,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -163,220 +371,62 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: <Widget>[
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // Make the width 80% of the screen
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Full Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    validator: (value) => value == null || value.isEmpty ? 'Full name is required' : null,
-                  ),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (int page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  children: <Widget>[
+                    _buildPersonalInfoPage(),
+                    _buildContactInfoPage(),
+                    _buildAddressPage(),
+                  ],
                 ),
               ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  if (_currentPage > 0)
+                    ElevatedButton(
+                      onPressed: () {
+                        _pageController.previousPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      child: Text('Prev'),
                     ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) => value == null || value.isEmpty ? 'Email is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  if (_currentPage < 2)
+                    ElevatedButton(
+                      onPressed: () {
+                        _pageController.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      child: Text('Next'),
                     ),
-                    keyboardType: TextInputType.phone,
-                    validator: _validatePhone,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: InputDecoration(
-                      labelText: 'Gender',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  if (_currentPage == 2)
+                    ElevatedButton(
+                      onPressed: _signUp,
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(color: Colors.white),
                       ),
-                    ),
-                    items: ['Male', 'Female'].map((String gender) {
-                      return DropdownMenuItem(value: gender, child: Text(gender));
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    },
-                    validator: (value) => value == null ? 'Gender is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _cityController,
-                    decoration: InputDecoration(
-                      labelText: 'City',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    validator: (value) => value == null || value.isEmpty ? 'City is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _subCityController,
-                    decoration: InputDecoration(
-                      labelText: 'Sub City',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    validator: (value) => value == null || value.isEmpty ? 'Sub City is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _woredaController,
-                    decoration: InputDecoration(
-                      labelText: 'Woreda',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value == null || value.isEmpty ? 'Woreda is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _houseNoController,
-                    decoration: InputDecoration(
-                      labelText: 'House No',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    validator: (value) => value == null || value.isEmpty ? 'House No is required' : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    obscureText: true,
-                    validator: _validatePassword,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextFormField(
-                    controller: _confirmPasswordController,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                    ),
-                    obscureText: true,
-                    validator: _validateConfirmPassword,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              FadeTransition(
-                opacity: _animation,
-                child: Center(
-                  child: _isLoading
-                      ? CircularProgressIndicator()
-                      : ElevatedButton(
-                          onPressed: _signUp,
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF005CFF),
-                            padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF005CFF),
+                        padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),

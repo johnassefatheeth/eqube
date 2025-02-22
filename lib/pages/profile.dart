@@ -129,24 +129,26 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             const SizedBox(height: 10),
 
-            // Personal Info
-            const Text('Personal Information',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
+            // Personal Information
+            const Text(
+              'Personal Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF005CFF)),
+            ),
+            const Divider(color: Colors.grey, thickness: 1),
+            const SizedBox(height: 10),
             TextField(
               controller: _fullNameController,
               decoration: const InputDecoration(
-                hintText: 'Full Name',
+                labelText: 'Full Name',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 10),
-
-            // Gender
-            const Text('Gender',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const Text(
+              'Gender',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 5),
             DropdownButtonFormField<String>(
               value: _gender,
@@ -161,70 +163,70 @@ class _ProfilePageState extends State<ProfilePage> {
                   .toList(),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 20),
 
             // Contact Information
-            const Text('Contact Information',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
+            const Text(
+              'Contact Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF005CFF)),
+            ),
+            const Divider(color: Colors.grey, thickness: 1),
+            const SizedBox(height: 10),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                hintText: 'Email',
+                labelText: 'Email',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _phoneController,
               decoration: const InputDecoration(
-                hintText: 'Phone Number',
+                labelText: 'Phone Number',
                 enabled: false,
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                 suffixIcon: Icon(Icons.phone, color: Colors.grey),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Location Details
-            const Text('Location Details',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
+            // Address Information
+            const Text(
+              'Address Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF005CFF)),
+            ),
+            const Divider(color: Colors.grey, thickness: 1),
+            const SizedBox(height: 10),
             TextField(
               controller: _cityController,
               decoration: const InputDecoration(
-                hintText: 'City',
+                labelText: 'City',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _subCityController,
               decoration: const InputDecoration(
-                hintText: 'Sub-city',
+                labelText: 'Sub-city',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _weredaController,
               decoration: const InputDecoration(
-                hintText: 'Wereda',
+                labelText: 'Wereda',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
               ),
             ),
             const SizedBox(height: 20),
@@ -236,13 +238,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                  child: Text('Save Changes',
-                      style: TextStyle(color: Colors.white, fontSize: 14)),
+                child: const Text(
+                  'Save Changes',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
             ),
@@ -258,13 +260,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF005CFF),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                  child: Text('Log out',
-                      style: TextStyle(color: Colors.white, fontSize: 14)),
+                child: const Text(
+                  'Log out',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
             ),

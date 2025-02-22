@@ -149,6 +149,16 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   Widget _buildPersonalInfoPage() {
     return ListView(
       children: <Widget>[
+        Column(
+          children: [
+            Icon(Icons.person_outline, size: 60, color: Color(0xFF005CFF)),
+            SizedBox(height: 10),
+            Text(
+              'Personal Information',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF005CFF))),
+            SizedBox(height: 20),
+          ],
+        ),
         FadeTransition(
           opacity: _animation,
           child: Container(
@@ -210,13 +220,23 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
             ),
           ),
         ),
-    ],
+      ],
     );
   }
 
   Widget _buildContactInfoPage() {
     return ListView(
       children: <Widget>[
+        Column(
+          children: [
+            Icon(Icons.phone_android, size: 60, color: Color(0xFF005CFF)),
+            SizedBox(height: 10),
+            Text(
+              'Contact Information',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF005CFF))),
+            SizedBox(height: 20),
+          ],
+        ),
         FadeTransition(
           opacity: _animation,
           child: Container(
@@ -280,6 +300,16 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   Widget _buildAddressPage() {
     return ListView(
       children: <Widget>[
+        Column(
+          children: [
+            Icon(Icons.home_outlined, size: 60, color: Color(0xFF005CFF)),
+            SizedBox(height: 10),
+            Text(
+              'Address Information',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF005CFF))),
+            SizedBox(height: 20),
+          ],
+        ),
         FadeTransition(
           opacity: _animation,
           child: Container(
@@ -388,6 +418,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                   ],
                 ),
               ),
+              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -399,7 +430,15 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                           curve: Curves.easeInOut,
                         );
                       },
-                      child: Text('Prev'),
+                      child: Text('Prev',
+                          style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF005CFF),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                   if (_currentPage < 2)
                     ElevatedButton(
@@ -409,20 +448,28 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
                           curve: Curves.easeInOut,
                         );
                       },
-                      child: Text('Next'),
+                      child: Text('Next'
+                          ,style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF005CFF),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                   if (_currentPage == 2)
                     ElevatedButton(
                       onPressed: _signUp,
                       child: Text(
-                        'Sign Up',
+                        'Submit',
                         style: TextStyle(color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF005CFF),
-                        padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
